@@ -8,7 +8,8 @@ public class Cover : MonoBehaviour
     [Header("Cover Infos")]
     [SerializeField] private float Health;
     [SerializeField] private int Capacity;
-    [Range(0,1)][SerializeField] private int DirectionToUse = 1;
+    [Range(-1,1)][SerializeField] private int DirectionToUse = 1;
+    [SerializeField] private List<Transform> CoverBounds = new List<Transform>(2) { null,null};
 
     private List<GameObject> EntityUsingCover = new List<GameObject>();
 
@@ -66,14 +67,18 @@ public class Cover : MonoBehaviour
         //On remplace les structs de l'Entity par newStruct
         Entity.GetComponent<StatePhaseEntity>().CoverCharacterPredifineTransform = newStruct;
     }
-
-
+    public List<Transform> GetCoverBounds()
+    {
+        return CoverBounds;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.tag == "Player")
         {
             if (collision.isTrigger) return;
+
+           
 
             if (EntityUsingCover.Count < Capacity)
             {
@@ -92,9 +97,27 @@ public class Cover : MonoBehaviour
                 //Définir les zones exposées de la couverture
                 Player.GetComponent<BoundTarget>().SetExposedPartOfEntity(!ProtectHead, !ProtectBody);
 
+                //Définis la zone de tir de la couverture
+                Player.GetComponent<BoundTarget>().SetCoverBounds(CoverBounds);
+
             }
 
         }
     }
 
+    //Appelé quand l'entité quitte la couverture ou quand cette dernière est détruire
+    private void ExitCover()
+    {
+        foreach (GameObject Entity in EntityUsingCover)
+        {
+            //Désctiver le state EnterInCover de l'entité
+
+
+            //Définir les zones exposées de la couverture
+            Entity.GetComponent<BoundTarget>().SetExposedPartOfEntity(true, true);
+
+            //Définis la zone de tir de la couverture
+            Entity.GetComponent<BoundTarget>().SetCoverBounds(null);
+        }
+    }
 }

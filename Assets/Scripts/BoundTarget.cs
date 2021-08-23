@@ -13,6 +13,8 @@ public class BoundTarget : MonoBehaviour
     private bool IsHeadExposed;
     private bool IsBodyExposed;
 
+    [SerializeField]private List<Transform> CoverBounds = new List<Transform>(2) { null, null };
+
     //Cover accèdera à cette fonction 
     public void SetExposedPartOfEntity(bool HeadIsExposed = true, bool BodyIsExposed = true)
     {
@@ -20,9 +22,20 @@ public class BoundTarget : MonoBehaviour
     }
 
     //SetPhaseEntity accède à cette fonction pour tirer
-    public List<Transform> GetBoundsTargetWhenCover() //Défini quelle liste envoyer, la liste aura 2 transforms représentant entre où et où on peut tirer
+    public List<Transform> GetCoverBounds() //Défini quelle liste envoyer, la liste aura 2 transforms représentant entre où et où on peut tirer
     {
-        var myList = new List<Transform>(2); 
+        return CoverBounds;
+    }
+    public void SetCoverBounds(List<Transform> myList)
+    {
+        CoverBounds = myList;
+    }
+
+
+
+    public List<Transform> GetBoundsTargetWhenUncover()
+    {
+        var myList = new List<Transform>(2);
 
         // /!\ Ne pas mettre de else if
         if (IsHeadExposed) myList.Add(HeadBoundsUpperPoint);
@@ -35,16 +48,6 @@ public class BoundTarget : MonoBehaviour
             myList[0] = HeadBoundsUpperPoint;
             myList[1] = BodyBoundsLowerPoint;
         }
-
-        return myList;
-    }
-
-    public List<Transform> GetBoundsTargetWhenUncover()
-    {
-        var myList = new List<Transform>(2);
-
-        myList.Add(HeadBoundsUpperPoint);
-        myList.Add(BodyBoundsLowerPoint);
 
         return myList;
 

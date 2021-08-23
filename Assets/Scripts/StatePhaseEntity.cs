@@ -37,7 +37,7 @@ public class StatePhaseEntity : MonoBehaviour
     private EnumState State = EnumState.InCover;
     private EnumState previousState;
     [SerializeField] [Range(0, 1)] private int WalkingDirection = 1;
-    private bool IsUncover = true;
+    private bool IsCovered = false;
 
     private Animator animator;
 
@@ -53,14 +53,16 @@ public class StatePhaseEntity : MonoBehaviour
     private GameObject Target;
 
     [Header("Target Bound")]
-    [SerializeField] private List<Transform> CacheTargetBoundsListUncovered; //Se définit dans Get de Target;
-    [SerializeField]private List<Transform> CacheTargetBoundsListCovered; //Se définit dans InternalSetCacheTargetBoundsListCoveredByAccessToGetUncoverBoundsTarget()
+    [SerializeField] private List<Transform> CacheTargetBoundsListUncovered; 
+    [SerializeField]private List<Transform> CacheCoverBoundsList; 
     private List<Transform> TargetBoundsListForAim
     {
         get
         {
-            if (Target.GetComponent<StatePhaseEntity>().IsUncover) return CacheTargetBoundsListUncovered;
-            else return CacheTargetBoundsListCovered;
+            bool TargetIsCovered = Target.GetComponent<StatePhaseEntity>().GetIsCovered();
+
+            if (TargetIsCovered) return CacheCoverBoundsList;
+            else return CacheTargetBoundsListUncovered;
         }
     }
     [Range(0, 1)] private float RandomAim;
@@ -74,7 +76,6 @@ public class StatePhaseEntity : MonoBehaviour
             //Définir le layer des ennemis
             if (gameObject.layer == LayerMask.NameToLayer("Team1")) result = LayerMask.NameToLayer("Team2");
             if (gameObject.layer == LayerMask.NameToLayer("Team2")) result = LayerMask.NameToLayer("Team1");
-
             return result;
         }
     }
@@ -118,9 +119,9 @@ public class StatePhaseEntity : MonoBehaviour
     #endregion
     public EnumState GetState { get { return State; } }
 
-    public bool GetIsUncover()
+    public bool GetIsCovered()
     {
-        return IsUncover;
+        return IsCovered;
     }
 
     public void SetState(EnumState StateName)
@@ -130,9 +131,9 @@ public class StatePhaseEntity : MonoBehaviour
         State = StateName;
         ChangeState();
     }
-    public void SetIsUncover(bool mybool)
+    public void SetIsCovered(bool mybool)
     {
-        IsUncover = mybool;
+        IsCovered = mybool;
     }
     /// <param name="increment">set to +1 to target next enemy or -1 to target previous enemy </param>
     public void SetEnemySelectedByIncrement(int increment)
@@ -168,7 +169,8 @@ public class StatePhaseEntity : MonoBehaviour
 
         if (Target.TryGetComponent(out BoundTarget BoundTarget))
         {
-            CacheTargetBoundsListCovered = BoundTarget.GetBoundsTargetWhenCover();
+            //A modifier si CoverBounds == null (pas de couverture)
+            CacheCoverBoundsList = BoundTarget.GetCoverBounds();
             CacheTargetBoundsListUncovered = BoundTarget.GetBoundsTargetWhenUncover();
         }
             
@@ -177,15 +179,10 @@ public class StatePhaseEntity : MonoBehaviour
         else
         {
             //Créer la nouvelle liste CacheTargetBoundsListCovered
-            CacheTargetBoundsListCovered = new List<Transform>(2);
-            CacheTargetBoundsListCovered.Add(null);
-            CacheTargetBoundsListCovered.Add(null);
+            CacheCoverBoundsList = new List<Transform>(2) {null, null };
 
             //Créer la nouvelle liste CacheTargetBoundsListUncovered
-            CacheTargetBoundsListUncovered = new List<Transform>(2);
-            CacheTargetBoundsListUncovered.Add(null);
-            CacheTargetBoundsListUncovered.Add(null);
-
+            CacheTargetBoundsListUncovered = new List<Transform>(2) {null,null };
         }
     }
      private void UpdateSelectedEnemy()
@@ -229,9 +226,6 @@ public class StatePhaseEntity : MonoBehaviour
         animator = GetComponent<Animator>();
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Cover"), gameObject.layer);
 
-        CacheTargetBoundsListUncovered = GetComponent<BoundTarget>().GetBoundsTargetWhenUncover();
-
-
     }
 
     private void ChangeState()
@@ -262,7 +256,7 @@ public class StatePhaseEntity : MonoBehaviour
     {
         PlacePlayerToFaceWithCover();
 
-        IsUncover = false;
+        SetIsCovered(true);
 
         StartCoroutine(PlayAnimation());
 
@@ -288,9 +282,7 @@ public class StatePhaseEntity : MonoBehaviour
     private void InCover()
     {
         PlacePlayerToFaceWithCover();
-        //        AimVariables.LeftArmTarget.GetComponentInParent<LimbSolver2D>().weight = 1;
-        IsUncover = false;
-
+        SetIsCovered(true);
         //Laisse l'entité face ou dos à l'ennemi
         if (CoverCharacterPredifineTransform.IsFacingEnnemyInCover == false)
         {
@@ -314,11 +306,8 @@ public class StatePhaseEntity : MonoBehaviour
     private void InWaitingPosition()
     {
         PlacePlayerToFaceWithCover();
-
-        IsUncover = true;
-
+        SetIsCovered(false);
         StartCoroutine(PlayAnimation());
-
         IEnumerator PlayAnimation()
         {
             print("InWaitingPosition");
@@ -349,8 +338,7 @@ public class StatePhaseEntity : MonoBehaviour
     private void InAimPosition()
     {
         PlacePlayerToFaceWithCover();
-
-        IsUncover = true;
+        SetIsCovered(false);
 
         StartCoroutine(UpdateAimAngle());//Mettre l'angle de l'animation à jour
         StartCoroutine(PlayAnimation());
@@ -389,11 +377,8 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void InFire()
     {
-
-        IsUncover = true;
-
         StartCoroutine(PlayAnimation());
-
+        SetIsCovered(false);
         IEnumerator PlayAnimation()
         {
 
