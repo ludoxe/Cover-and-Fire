@@ -34,6 +34,8 @@ public class Cover : MonoBehaviour
     [SerializeField] private bool ProtectHead;
     [SerializeField] private bool ProtectBody;
 
+
+    #region ExternalSet
     private void ExternalSetAllEntityStruct(GameObject Entity)
     {
         ExternalSetStatePhaseEntityCoverAnimation(Entity);
@@ -67,10 +69,15 @@ public class Cover : MonoBehaviour
         //On remplace les structs de l'Entity par newStruct
         Entity.GetComponent<StatePhaseEntity>().CoverCharacterPredifineTransform = newStruct;
     }
-    public List<Transform> GetCoverBounds()
+    private void ExternalSetStatePhaseEntityCover(GameObject Entity, GameObject Cover)
     {
-        return CoverBounds;
+        Entity.GetComponent<StatePhaseEntity>().SetCover(Cover);
     }
+    #endregion
+
+    #region Public Get
+
+    #endregion
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -94,6 +101,9 @@ public class Cover : MonoBehaviour
                 //Activer le state EnterInCover de l'entité
                 Player.GetComponent<StatePhaseEntity>().SetState(EnumState.EnterInCover) ;
 
+                //Définis la couverture actuelle du joueur
+                ExternalSetStatePhaseEntityCover(Player, this.gameObject);
+
                 //Définir les zones exposées de la couverture
                 Player.GetComponent<BoundTarget>().SetExposedPartOfEntity(!ProtectHead, !ProtectBody);
 
@@ -104,14 +114,15 @@ public class Cover : MonoBehaviour
 
         }
     }
-
     //Appelé quand l'entité quitte la couverture ou quand cette dernière est détruire
     private void ExitCover()
     {
         foreach (GameObject Entity in EntityUsingCover)
         {
-            //Désctiver le state EnterInCover de l'entité
+            //Désactiver le state EnterInCover de l'entité
 
+            //Désactiver la couverture actuelle du joueur
+            ExternalSetStatePhaseEntityCover(Entity, null);
 
             //Définir les zones exposées de la couverture
             Entity.GetComponent<BoundTarget>().SetExposedPartOfEntity(true, true);

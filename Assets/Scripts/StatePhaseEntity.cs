@@ -38,6 +38,7 @@ public class StatePhaseEntity : MonoBehaviour
     private EnumState previousState;
     [SerializeField] [Range(0, 1)] private int WalkingDirection = 1;
     private bool IsCovered = false;
+    private GameObject Cover;
 
     private Animator animator;
 
@@ -66,7 +67,6 @@ public class StatePhaseEntity : MonoBehaviour
         }
     }
     [Range(0, 1)] private float RandomAim;
-
     private int EnemiesLayer
     {
         get
@@ -79,11 +79,7 @@ public class StatePhaseEntity : MonoBehaviour
             return result;
         }
     }
-    public List<Transform> DebugList;
-    private void Update()
-    {
-        DebugList = TargetBoundsListForAim;
-    }
+
 
     #region structs
     public struct StructCharacterTransform
@@ -117,6 +113,8 @@ public class StatePhaseEntity : MonoBehaviour
         internal GameObject BulletWeaponLineCache;
     }
     #endregion
+
+    #region Public Get
     public EnumState GetState { get { return State; } }
 
     public bool GetIsCovered()
@@ -124,6 +122,13 @@ public class StatePhaseEntity : MonoBehaviour
         return IsCovered;
     }
 
+    public GameObject GetCover()
+    {
+        return Cover;
+    }
+    #endregion
+
+    #region Public Set
     public void SetState(EnumState StateName)
     {
         SetPreviousState();
@@ -155,6 +160,14 @@ public class StatePhaseEntity : MonoBehaviour
         else
             EnemySelector = 0;
     }
+    public void SetCover(GameObject Cover)
+    {
+        this.Cover = Cover;
+    }
+    
+    #endregion
+
+    #region Public Receive
     public void ReceiveEnemiesList(List<GameObject> List)
     {
         if (List == EnemiesList) return;
@@ -162,6 +175,16 @@ public class StatePhaseEntity : MonoBehaviour
         EnemiesList = new List<GameObject>(List);
         SetEnemySelectedByGameObject(Target);
     }
+
+    #endregion
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Cover"), gameObject.layer);
+
+    }
+
     private void InternalSetCacheTargetBoundsListsByAccessToGetUncoverBoundsTarget()
     {
         if (Target == null) return; //Ne fonctionne pas sans Target
@@ -169,9 +192,12 @@ public class StatePhaseEntity : MonoBehaviour
 
         if (Target.TryGetComponent(out BoundTarget BoundTarget))
         {
-            //A modifier si CoverBounds == null (pas de couverture)
-            CacheCoverBoundsList = BoundTarget.GetCoverBounds();
+            //Visera les parties exposés de l'ennemi
             CacheTargetBoundsListUncovered = BoundTarget.GetBoundsTargetWhenUncover();
+            //Visera les parties exposés de l'ennemi si la couverture n'a pas de bounds
+            if (BoundTarget.GetCoverBounds() == null) CacheCoverBoundsList = CacheTargetBoundsListUncovered;
+            //Visera la couverture
+            else CacheCoverBoundsList = BoundTarget.GetCoverBounds();
         }
             
 
@@ -185,7 +211,7 @@ public class StatePhaseEntity : MonoBehaviour
             CacheTargetBoundsListUncovered = new List<Transform>(2) {null,null };
         }
     }
-     private void UpdateSelectedEnemy()
+    private void UpdateSelectedEnemy()
     {
         CheckEnemySelector();
         SelectTargetGameObjectFromSelector();
@@ -215,18 +241,11 @@ public class StatePhaseEntity : MonoBehaviour
         animator.SetBool(BoolName, true);
     }
 
-    /*
-     * Concerne les states de l'entity
-     * 
-     */
+    
+    
+    //Concerne les states de l'entity 
+     
 
-
-    private void Start()
-    {
-        animator = GetComponent<Animator>();
-        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Cover"), gameObject.layer);
-
-    }
 
     private void ChangeState()
     {
@@ -249,6 +268,7 @@ public class StatePhaseEntity : MonoBehaviour
         if (WalkingDirection == 1) transform.localEulerAngles = new Vector2(0, 0);
         if (WalkingDirection == 0) transform.localEulerAngles = new Vector2(0, 180);
     }
+
 
     #region States
 
@@ -370,7 +390,6 @@ public class StatePhaseEntity : MonoBehaviour
                 AimAngle();
                 yield return null;
             }
-            print("the end");
             yield return null;
         }
     }
@@ -394,11 +413,11 @@ public class StatePhaseEntity : MonoBehaviour
 
     #endregion
 
-    /*
+    
+    
+    // Concerne les tirs et la visée 
      
-     * Concerne les tirs et la visée 
      
-     */
 
     // Cette fonction s'active dans l'event de l'animation
     private void Shoot()
@@ -462,7 +481,8 @@ public class StatePhaseEntity : MonoBehaviour
         GetComponent<Animator>().SetFloat("angle direction", Angle);
     }
 
-    // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste
+
+    // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste filtrée
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
     {
 
@@ -470,9 +490,9 @@ public class StatePhaseEntity : MonoBehaviour
         Transform AimReferencePoint = AimVariables.AimReferencePoint.transform;
         string ThisLayerMask = LayerMask.LayerToName(gameObject.layer);
 
-        LayerMask MyLayerMask; //Définis le layermask selon la filtration de la fonction
-        if (FilterLinecastFromCover) MyLayerMask = LayerMask.GetMask(ThisLayerMask, "Cover"); //On ne prend pas en compte les covers
-        else MyLayerMask = LayerMask.GetMask(ThisLayerMask); //On prend en compte les covers
+        var TargetCover = Target.GetComponent<StatePhaseEntity>().GetCover(); //Défini Cover de Target pour l'utiliser dans Predicate();
+
+        LayerMask MyLayerMask = LayerMask.GetMask(ThisLayerMask); //Définis le layermask  de l'entité
 
         var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras où sont calculés les angles jusqu'à la cible
         List<RaycastHit2D> result = LinecastHitsArray.ToList(); // Convertit LinecastHitsArray en List
@@ -482,10 +502,15 @@ public class StatePhaseEntity : MonoBehaviour
 
         bool Predicate(RaycastHit2D GameObjectHit)
         {
-            //Si les gameobjects hits sont pas EnemiesLayer ou TargetableLayer et en plus, si n'est pas la Target
+            //Si les gameobjects hits sont EnemiesLayer ou TargetableLayer et en plus, si n'est pas la Target
             if ((GameObjectHit.transform.gameObject.layer == EnemiesLayer
                 || GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Targetable"))
                 && GameObjectHit.transform.gameObject != Target) return true;
+
+            //Si les gameObjects hits sont des covers et en plus, ne sont pas la cover de Target, et les arguments de la fonction FilterLinecastFromCover sont sur faux           
+            else if (GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && GameObjectHit.transform.gameObject != TargetCover && !FilterLinecastFromCover) return true;
+
+            //Mettre ici un else if le joueur est à couvert sans boundstarget alors supprimer le joueur des targets
 
             else return false;
         }
@@ -500,7 +525,7 @@ public class StatePhaseEntity : MonoBehaviour
 
         var BulletLineGameObject = Instantiate(BulletWeaponLineCache, new Vector2(), new Quaternion());
 
-        var MyLinecastToTargetList = SendLinecastToTargetAndConvertToFilteredList();
+        var MyLinecastToTargetList = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
 
 
         BulletLineGameObject.SetActive(true); // Active le gameObject pour y accéder dans la variable ci dessous + initialiser le GO

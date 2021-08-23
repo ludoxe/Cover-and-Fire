@@ -28,6 +28,14 @@ public class BoundTarget : MonoBehaviour
     }
     public void SetCoverBounds(List<Transform> myList)
     {
+        //Si la liste contient que des Bounds nulles
+        if (myList[0] == null || myList[1] == null) 
+        {
+            print("work");
+            CoverBounds[0] = HeadBoundsUpperPoint;
+            CoverBounds[1] = BodyBoundsLowerPoint;
+        }
+        else
         CoverBounds = myList;
     }
 
