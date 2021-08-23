@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 0e8dff0a80b2c1f40b734eef82cc43f1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Head: {instanceID: 0}
+  - Body: {instanceID: 0}
+  - BlackSkin: {fileID: 2100000, guid: a862f7f56f5bd2847aa21b6bc90dcb42, type: 2}
+  - WhiteSkin: {fileID: 2100000, guid: 7e137d52c04ed8848af85efdf051c30d, type: 2}
+  - BlackHead: {fileID: 21300000, guid: 787249024211ac545aecef3e2d91da24, type: 3}
+  - WhiteHead: {fileID: 4134470982481670237, guid: 19ab0df6363ff374988fb8ca0e30915a,
+      type: 3}
+  - FemaleBody: {fileID: 2161142225672563003, guid: 19ab0df6363ff374988fb8ca0e30915a,
+      type: 3}
+  - MaleBody: {fileID: 21300000, guid: 3ffeec989cb33eb4488e0f15d30b8756, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
