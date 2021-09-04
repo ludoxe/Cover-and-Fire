@@ -37,8 +37,11 @@ public class StatePhaseEntity : MonoBehaviour
     private EnumState State = EnumState.InCover;
     private EnumState previousState;
     [SerializeField] [Range(0, 1)] private int WalkingDirection = 1;
+
+    [Header("Cover Info")]
     private bool IsCovered = false;
     private GameObject Cover;
+    private bool IsInCoverTouchable;
 
     private Animator animator;
 
@@ -56,7 +59,7 @@ public class StatePhaseEntity : MonoBehaviour
     [Header("Target Bound")]
     [SerializeField] private List<Transform> CacheTargetBoundsListUncovered; 
     [SerializeField]private List<Transform> CacheCoverBoundsList; 
-    private List<Transform> TargetBoundsListForAim
+    private List<Transform> TargetBoundsListForAim //
     {
         get
         {
@@ -66,6 +69,15 @@ public class StatePhaseEntity : MonoBehaviour
             else return CacheTargetBoundsListUncovered;
         }
     }
+    private Dictionary<string, bool> TargetExposeInfo
+    {
+        get
+        {
+            if (Target == null) return null;
+            return Target.GetComponent<BoundTarget>().GetExposedParts();
+        }
+    }
+
     [Range(0, 1)] private float RandomAim;
     private int EnemiesLayer
     {
@@ -126,6 +138,17 @@ public class StatePhaseEntity : MonoBehaviour
     {
         return Cover;
     }
+
+    public bool GetIsInCoverTouchable()
+    {
+        return IsInCoverTouchable;
+    }
+
+    public List<Transform> GetTargetBoundsListForAim()
+    {
+        return TargetBoundsListForAim;
+    }
+
     #endregion
 
     #region Public Set
@@ -164,7 +187,11 @@ public class StatePhaseEntity : MonoBehaviour
     {
         this.Cover = Cover;
     }
-    
+    public void SetIsInCoverTouchable(bool IsTouchable)
+    {
+        IsInCoverTouchable = IsTouchable;
+    }
+
     #endregion
 
     #region Public Receive
@@ -497,7 +524,8 @@ public class StatePhaseEntity : MonoBehaviour
         var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras où sont calculés les angles jusqu'à la cible
         List<RaycastHit2D> result = LinecastHitsArray.ToList(); // Convertit LinecastHitsArray en List
 
-        result.RemoveAll(Predicate); //supprime tous les ennemis et targets qui ne sont pas la Target
+        result.RemoveAll(Predicate); //supprime tous les ennemis et targets qui ne sont pas la Target et la Target, si celle ci est en couverture complète
+
         return result; // on transforme la LinecastHit en List
 
         bool Predicate(RaycastHit2D GameObjectHit)
@@ -510,7 +538,12 @@ public class StatePhaseEntity : MonoBehaviour
             //Si les gameObjects hits sont des covers et en plus, ne sont pas la cover de Target, et les arguments de la fonction FilterLinecastFromCover sont sur faux           
             else if (GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && GameObjectHit.transform.gameObject != TargetCover && !FilterLinecastFromCover) return true;
 
-            //Mettre ici un else if le joueur est à couvert sans boundstarget alors supprimer le joueur des targets
+            //Si les gameobjects hits sont la target, et que target est à couvert 
+            else if (GameObjectHit.transform.gameObject == Target && Target.GetComponent<StatePhaseEntity>().GetIsCovered())
+            {
+                return true;
+            }
+
 
             else return false;
         }
@@ -550,7 +583,7 @@ public class StatePhaseEntity : MonoBehaviour
             //déplace le transform de BulletLineGameObject et donc du point de référence de LineRenderer pour avoir une destination locale
             BulletLineGameObject.transform.position = WeaponCanon.position;
 
-            //Les Bullets Line prennent les coordonnées locales du BulletLineGameObject + set les ponts de la line renderer pour tirer en ligne droite
+            //Les Bullets Line prennent les coordonnées locales du BulletLineGameObject + set les points de la line renderer pour tirer en ligne droite
             BulletLine.SetPosition(0, new Vector2());
             BulletLine.SetPosition(1, (WeaponCanon.right * 500));
 

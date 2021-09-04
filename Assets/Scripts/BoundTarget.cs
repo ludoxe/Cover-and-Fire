@@ -31,7 +31,6 @@ public class BoundTarget : MonoBehaviour
         //Si la liste contient que des Bounds nulles
         if (myList[0] == null || myList[1] == null) 
         {
-            print("work");
             CoverBounds[0] = HeadBoundsUpperPoint;
             CoverBounds[1] = BodyBoundsLowerPoint;
         }
@@ -60,6 +59,17 @@ public class BoundTarget : MonoBehaviour
         return myList;
 
     }
+
+    public Dictionary<string, bool> GetExposedParts()
+    {
+        Dictionary<string,bool> myDictionary = new Dictionary<string, bool>(2) ;
+
+        myDictionary.Add("HeadIsExposed", true);
+        myDictionary.Add("BodyIsExposed", true);
+        return myDictionary;
+
+    }
+
     private void ExposeEntity(bool HeadIsExposed = true , bool BodyIsExposed = true) //Défini quelle partie du corps des entités sont exposés aux tirs
     {
         //Met tout false avant de définir ce qui sera true

@@ -8,8 +8,10 @@ public class Cover : MonoBehaviour
     [Header("Cover Infos")]
     [SerializeField] private float Health;
     [SerializeField] private int Capacity;
+    [SerializeField] private bool IsCoverTouchable = true;
     [Range(-1,1)][SerializeField] private int DirectionToUse = 1;
     [SerializeField] private List<Transform> CoverBounds = new List<Transform>(2) { null,null};
+
 
     private List<GameObject> EntityUsingCover = new List<GameObject>();
 
@@ -73,6 +75,12 @@ public class Cover : MonoBehaviour
     {
         Entity.GetComponent<StatePhaseEntity>().SetCover(Cover);
     }
+
+    private void ExternalSetStatePhaseEntityIsCoverTouchable(GameObject Entity, bool IsCoverTouchable)
+    {
+        Entity.GetComponent<StatePhaseEntity>().SetIsInCoverTouchable(IsCoverTouchable);
+    }
+
     #endregion
 
     #region Public Get
@@ -103,6 +111,9 @@ public class Cover : MonoBehaviour
 
                 //Définis la couverture actuelle du joueur
                 ExternalSetStatePhaseEntityCover(Player, this.gameObject);
+
+                //Définis la couverture comme touchable ou non
+                ExternalSetStatePhaseEntityIsCoverTouchable(Player, IsCoverTouchable);
 
                 //Définir les zones exposées de la couverture
                 Player.GetComponent<BoundTarget>().SetExposedPartOfEntity(!ProtectHead, !ProtectBody);
