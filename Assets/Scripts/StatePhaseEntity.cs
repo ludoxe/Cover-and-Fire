@@ -46,10 +46,11 @@ public class StatePhaseEntity : MonoBehaviour
     private Animator animator;
 
     [Header("structs")]
-    public StructAnimationWithCover CoverAnimation = new StructAnimationWithCover();
-    public StructCharacterTransform CoverCharacterPredifineTransform = new StructCharacterTransform();
-    public StructAimVariables AimVariables = new StructAimVariables();
-    public StructShootVariables ShootVariables = new StructShootVariables();
+    public Utility.StructAnimationWithCover CoverAnimation = new Utility.StructAnimationWithCover();
+    public Utility.StructCharacterTransform CoverCharacterPredifineTransform = new Utility.StructCharacterTransform();
+    public Utility.StructAimVariables AimVariables = new Utility.StructAimVariables();
+    public Utility.StructShootVariables ShootVariables = new Utility.StructShootVariables();
+    public Utility.StructDamageInfo DamageInfo = new Utility.StructDamageInfo();
 
     [Header("Entity Detector")]
     [SerializeField] private List<GameObject> EnemiesList = new List<GameObject>();
@@ -92,38 +93,10 @@ public class StatePhaseEntity : MonoBehaviour
         }
     }
 
+    private List<RaycastHit2D> LinecastResult;
 
     #region structs
-    public struct StructCharacterTransform
-    {
-        internal Vector2 PositionInCover;
-        internal bool IsFacingEnnemyInCover;
-    }
-    public struct StructAnimationWithCover
-    {
-        internal AnimationClip AnimationToGetInCover;
-        internal AnimationClip AnimationToGetOutCover;
-        internal AnimationClip AnimationInCover;
-        internal AnimationClip AnimationInAimPosition;
-        internal AnimationClip AnimationInWaitingPosition;
-        internal AnimationClip AnimationInFire;
-    }
-    public struct StructAimVariables
-    {
-        [Header("Aim Variables")]
-        internal GameObject LeftArmTarget;
-        internal GameObject RightArmTarget;
-        internal GameObject FirstHandGripGameObject;
-        internal GameObject SecondHandGripGameObject;
-        internal GameObject AimReferencePoint;
-
-    }
-    public struct StructShootVariables
-    {
-        [Header("Shoot variables")]
-        internal GameObject WeaponCanon;
-        internal GameObject BulletWeaponLineCache;
-    }
+  
     #endregion
 
     #region Public Get
@@ -449,9 +422,14 @@ public class StatePhaseEntity : MonoBehaviour
     // Cette fonction s'active dans l'event de l'animation
     private void Shoot()
     {
+        LinecastResult = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
+
         AimAngle();
         VisualBulletEffect(); //Effet de ligne atteignant sa cible
+        SendDamage(); //Envoie les dégats à ce qui est touché
 
+
+        LinecastResult = null;
     }
 
     private Vector2 RandomTargetPositionBetweenBounds()
@@ -558,17 +536,14 @@ public class StatePhaseEntity : MonoBehaviour
 
         var BulletLineGameObject = Instantiate(BulletWeaponLineCache, new Vector2(), new Quaternion());
 
-        var MyLinecastToTargetList = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
-
-
         BulletLineGameObject.SetActive(true); // Active le gameObject pour y accéder dans la variable ci dessous + initialiser le GO
         var BulletLine = BulletLineGameObject.GetComponent<LineRenderer>();
 
 
 
-        if (MyLinecastToTargetList.Count > 0)
+        if (LinecastResult.Count > 0)
         {
-            RaycastHit2D Target = MyLinecastToTargetList[0];
+            RaycastHit2D Target = LinecastResult[0];
 
             //déplace le transform de BulletLineGameObject et donc du point de référence de LineRenderer pour avoir une destination globale
             BulletLineGameObject.transform.position = new Vector2();
@@ -578,7 +553,7 @@ public class StatePhaseEntity : MonoBehaviour
             BulletLine.SetPosition(1, Target.point);
         }
 
-        if (MyLinecastToTargetList.Count == 0)
+        if (LinecastResult.Count == 0)
         {
             //déplace le transform de BulletLineGameObject et donc du point de référence de LineRenderer pour avoir une destination locale
             BulletLineGameObject.transform.position = WeaponCanon.position;
@@ -596,6 +571,14 @@ public class StatePhaseEntity : MonoBehaviour
             yield return new WaitForSeconds(0.03f);
             Destroy(BulletLineGameObject);
         }
+    }
+
+    private void SendDamage()
+    {
+        RaycastHit2D Target = LinecastResult[0];
+
+//d'abord créer une classe parente puis appeler une fonction receive dedans
+
     }
 
 }

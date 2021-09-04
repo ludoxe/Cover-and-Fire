@@ -20,3 +20,6 @@ MonoBehaviour:
   GunSpriteLocalPosition: {x: 1, y: 0.1}
   FirstHandGripPosition: {x: -0.894, y: -0.037}
   SecondHandGripPosition: {x: 0.152, y: 0.27}
+  CanonPosition: {x: 0, y: 0}
+  CanonRotation: {x: 0, y: 0, z: 0}
+  WeaponBaseDamage: 10

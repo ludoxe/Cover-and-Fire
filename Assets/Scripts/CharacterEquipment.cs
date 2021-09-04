@@ -51,7 +51,7 @@ public class CharacterEquipment : MonoBehaviour
 
     private void SetWeaponPlayer()
     {
-        GetComponent<Shoot>().SetWeapon = Gun ;
+        GetComponent<Weapon>().SetWeapon = Gun ;
     }
 
 }

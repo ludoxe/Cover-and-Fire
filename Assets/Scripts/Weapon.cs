@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D.IK ;
 
-public class Shoot : MonoBehaviour
+public class Weapon : MonoBehaviour
 {
     [Header("Weapon")]
     private Data_Item_Gun WeaponData;
@@ -26,6 +26,9 @@ public class Shoot : MonoBehaviour
     [SerializeField] private GameObject AimReferencePoint;
     private float AngleBetweenEntityAndWeaponCanon;
 
+    [Header("Damage Info")]
+    private Utility.StructDamageInfo DamageStats;
+
     [Header("Other")]
     [SerializeField] private GameObject HeadBone;
     [SerializeField] private GameObject Target;
@@ -45,7 +48,7 @@ public class Shoot : MonoBehaviour
     }
     private void ExternalSetStatePhaseEntityStructVariables()
     {
-        var AimStruct = new StatePhaseEntity.StructAimVariables();
+        var AimStruct = new Utility.StructAimVariables();
 
         AimStruct.LeftArmTarget = LeftArmTarget;
         AimStruct.RightArmTarget = RightArmTarget;
@@ -54,17 +57,22 @@ public class Shoot : MonoBehaviour
         AimStruct.AimReferencePoint = AimReferencePoint;
 
 
-        var ShootStruct = new StatePhaseEntity.StructShootVariables();
+        var ShootStruct = new Utility.StructShootVariables();
 
         ShootStruct.WeaponCanon = WeaponCanon;
         ShootStruct.BulletWeaponLineCache = BulletWeaponLineCache;
 
         GetComponent<StatePhaseEntity>().AimVariables = AimStruct;
         GetComponent<StatePhaseEntity>().ShootVariables = ShootStruct;
+
+        //Si bug, à déplacer dans une autre méthode non existante
+        GetComponent<StatePhaseEntity>().DamageInfo = DamageStats;
     }
     private void UpdateScript() 
     {
         if (WeaponData == null) return;
+
+        ExternalSetStatePhaseEntityStructVariables(); //Si bug, supprimer cette ligne
 
         FirstHandGripGameObject.transform.localPosition = WeaponData.GetFirstHandGripPosition;
         SecondHandGripGameObject.transform.localPosition = WeaponData.GetSecondHandGripPosition;

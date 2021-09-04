@@ -22,3 +22,4 @@ MonoBehaviour:
   SecondHandGripPosition: {x: 0, y: 0}
   CanonPosition: {x: 0.903, y: 0.363}
   CanonRotation: {x: 0, y: 0, z: 0}
+  WeaponBaseDamage: 10

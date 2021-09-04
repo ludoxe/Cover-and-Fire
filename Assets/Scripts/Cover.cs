@@ -46,7 +46,7 @@ public class Cover : MonoBehaviour
     private void ExternalSetStatePhaseEntityCoverAnimation(GameObject Entity)
     {
         //On créer newStruct
-        StatePhaseEntity.StructAnimationWithCover newStruct = new StatePhaseEntity.StructAnimationWithCover();
+        Utility.StructAnimationWithCover newStruct = new Utility.StructAnimationWithCover();
 
         //On assigne les valeurs de newStruct
         newStruct.AnimationToGetInCover = AnimationToGetInCover ;
@@ -62,7 +62,7 @@ public class Cover : MonoBehaviour
     private void ExternalSetStatePhaseEntityCoverCharacterPredifineTransform(GameObject Entity)
     {
         //On créer newStruct
-        StatePhaseEntity.StructCharacterTransform newStruct = new StatePhaseEntity.StructCharacterTransform();
+        Utility.StructCharacterTransform newStruct = new Utility.StructCharacterTransform();
 
         //On assigne les valeurs de newStruct
         newStruct.PositionInCover = transform.TransformPoint(LocalPositionInCover);
