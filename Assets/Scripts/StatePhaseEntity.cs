@@ -58,13 +58,22 @@ public class StatePhaseEntity : MonoBehaviour
     private GameObject Target;
 
     [Header("Target Bound")]
-    [SerializeField] private List<Transform> CacheTargetBoundsListUncovered; 
-    [SerializeField]private List<Transform> CacheCoverBoundsList; 
+    [SerializeField] private List<Transform> CacheTargetBoundsListUncovered;
+    [SerializeField] private List<Transform> CacheCoverBoundsList;
     private List<Transform> TargetBoundsListForAim //
     {
         get
         {
-            bool TargetIsCovered = Target.GetComponent<StatePhaseEntity>().GetIsCovered();
+            bool TargetIsCovered;
+            if (Target.TryGetComponent(out StatePhaseEntity EntityScript))
+            {
+                TargetIsCovered = EntityScript.GetIsCovered();
+            }
+            else
+            {
+                return CacheTargetBoundsListUncovered;
+            }
+
 
             if (TargetIsCovered) return CacheCoverBoundsList;
             else return CacheTargetBoundsListUncovered;
@@ -96,7 +105,7 @@ public class StatePhaseEntity : MonoBehaviour
     private List<RaycastHit2D> LinecastResult;
 
     #region structs
-  
+
     #endregion
 
     #region Public Get
@@ -199,16 +208,16 @@ public class StatePhaseEntity : MonoBehaviour
             //Visera la couverture
             else CacheCoverBoundsList = BoundTarget.GetCoverBounds();
         }
-            
+
 
         // S'il n'y a pas de TargetBounds, mets les TargetsBounds en null (par inférence, revient à définir la cible comme la position du Target, cf RandomTargetPositionBetweenBounds() )
         else
         {
             //Créer la nouvelle liste CacheTargetBoundsListCovered
-            CacheCoverBoundsList = new List<Transform>(2) {null, null };
+            CacheCoverBoundsList = new List<Transform>(2) { null, null };
 
             //Créer la nouvelle liste CacheTargetBoundsListUncovered
-            CacheTargetBoundsListUncovered = new List<Transform>(2) {null,null };
+            CacheTargetBoundsListUncovered = new List<Transform>(2) { null, null };
         }
     }
     private void UpdateSelectedEnemy()
@@ -241,10 +250,10 @@ public class StatePhaseEntity : MonoBehaviour
         animator.SetBool(BoolName, true);
     }
 
-    
-    
+
+
     //Concerne les states de l'entity 
-     
+
 
 
     private void ChangeState()
@@ -413,13 +422,13 @@ public class StatePhaseEntity : MonoBehaviour
 
     #endregion
 
-    
-    
-    // Concerne les tirs et la visée 
-     
-     
 
-    
+
+    // Concerne les tirs et la visée 
+
+
+
+
     private void Shoot(AnimationEvent myEvent) // Cette fonction s'active dans l'event de l'animation
     {
         if (myEvent.animatorClipInfo.weight > 0.5f)
@@ -493,14 +502,15 @@ public class StatePhaseEntity : MonoBehaviour
     // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste filtrée
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
     {
+        Target.TryGetComponent(out StatePhaseEntity TargetIsEntity); //Définis le script de l'Entité
+        GameObject TargetCover = null;
 
-
+        if (TargetIsEntity) TargetCover = TargetIsEntity.GetCover(); //Si une entité, défini Cover de Target pour l'utiliser dans Predicate();
         Transform AimReferencePoint = AimVariables.AimReferencePoint.transform;
+
         string ThisLayerMask = LayerMask.LayerToName(gameObject.layer);
-
-        var TargetCover = Target.GetComponent<StatePhaseEntity>().GetCover(); //Défini Cover de Target pour l'utiliser dans Predicate();
-
         LayerMask MyLayerMask = LayerMask.GetMask(ThisLayerMask); //Définis le layermask  de l'entité
+        
 
         var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras où sont calculés les angles jusqu'à la cible
         List<RaycastHit2D> result = LinecastHitsArray.ToList(); // Convertit LinecastHitsArray en List
@@ -512,22 +522,40 @@ public class StatePhaseEntity : MonoBehaviour
         bool Predicate(RaycastHit2D GameObjectHit)
         {
             //Si les gameobjects hits sont EnemiesLayer ou TargetableLayer et en plus, si n'est pas la Target
+            //On appellera tout le temps cette condition quand la cible est à découvert
             if ((GameObjectHit.transform.gameObject.layer == EnemiesLayer
                 || GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Targetable"))
                 && GameObjectHit.transform.gameObject != Target) return true;
 
-            //Si les gameObjects hits sont des covers et en plus, ne sont pas la cover de Target, et les arguments de la fonction FilterLinecastFromCover sont sur faux           
-            else if (GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && GameObjectHit.transform.gameObject != TargetCover && !FilterLinecastFromCover) return true;
+            //Concerne Target si est une Entity
+            else if (TargetIsEntity)
+            {
 
-            //Si les gameobjects hits sont la target, et que target est à couvert 
-            else if (GameObjectHit.transform.gameObject == Target && Target.GetComponent<StatePhaseEntity>().GetIsCovered())
+                //Si les gameObjects hits sont des covers et en plus, ne sont pas la cover de Target, et les arguments de la fonction FilterLinecastFromCover sont sur faux
+                //On l'appelle quand on veut toucher la couverture de l'ennemi car la cible est à couvert
+                if (GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && GameObjectHit.transform.gameObject != TargetCover && !FilterLinecastFromCover) return true;
+
+
+                //Si les gameobjects hits sont la target, et que target est à couvert 
+                //On l'appelle quand on ne veut rien toucher car la cible est à couvert
+                else if (GameObjectHit.transform.gameObject == Target && TargetIsEntity.GetIsCovered())
+                {
+                    return true;
+                }
+                else return false;
+
+            }
+
+            //Concerne Target si est une Targetable
+            //Si les gameObjects hits sont des covers, et les arguments de la fonction FilterLinecastFromCover sont sur faux
+            else if (!TargetIsEntity && GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && !FilterLinecastFromCover)
             {
                 return true;
             }
 
-
             else return false;
         }
+
 
     }
 
@@ -583,7 +611,7 @@ public class StatePhaseEntity : MonoBehaviour
 
         print("Send from " + gameObject.name);
 
-        if(Target.transform.TryGetComponent(out IDamageable TargetStatus))
+        if (Target.transform.TryGetComponent(out IDamageable TargetStatus))
         {
             TargetStatus.ReceiveDamage(DamageInfo);
         }
