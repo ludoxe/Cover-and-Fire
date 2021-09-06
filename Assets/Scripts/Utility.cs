@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
 public static class Utility 
 {
     #region structs
@@ -45,4 +42,9 @@ public static class Utility
 
     #endregion
 
+}
+
+public interface IDamageable
+{
+    void ReceiveDamage(Utility.StructDamageInfo DamageInfo);
 }

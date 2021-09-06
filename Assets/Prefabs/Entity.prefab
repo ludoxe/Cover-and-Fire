@@ -284,6 +284,7 @@ GameObject:
   - component: {fileID: 1202260931}
   - component: {fileID: 3814913853621626703}
   - component: {fileID: 759036769}
+  - component: {fileID: -1697436571146990058}
   - component: {fileID: 1202260924}
   - component: {fileID: 1202260932}
   - component: {fileID: 2491019044300737684}
@@ -415,6 +416,18 @@ MonoBehaviour:
   SecondHandGripGameObject: {fileID: 8069662528532969494}
   LeftArmTarget: {fileID: 3814913855343461631}
   RightArmTarget: {fileID: 3814913854745357332}
+--- !u!114 &-1697436571146990058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3814913853621626702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d0064b69ac800e44a460ce9e92ec002, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1202260924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,6 +443,8 @@ MonoBehaviour:
   WalkingDirection: 1
   EnemiesList: []
   EnemySelector: -1
+  CacheTargetBoundsListUncovered: []
+  CacheCoverBoundsList: []
 --- !u!114 &1202260932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -486,6 +501,9 @@ MonoBehaviour:
   HeadBoundsLowerPoint: {fileID: 6743352579039953166}
   BodyBoundsUpperPoint: {fileID: 3742738125594585983}
   BodyBoundsLowerPoint: {fileID: 3917625069297831193}
+  CoverBounds:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!61 &3146450700339020919
 BoxCollider2D:
   m_ObjectHideFlags: 0

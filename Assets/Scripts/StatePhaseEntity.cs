@@ -419,17 +419,20 @@ public class StatePhaseEntity : MonoBehaviour
      
      
 
-    // Cette fonction s'active dans l'event de l'animation
-    private void Shoot()
+    
+    private void Shoot(AnimationEvent myEvent) // Cette fonction s'active dans l'event de l'animation
     {
-        LinecastResult = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
+        if (myEvent.animatorClipInfo.weight > 0.5f)
+        {
+            LinecastResult = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
 
-        AimAngle();
-        VisualBulletEffect(); //Effet de ligne atteignant sa cible
-        SendDamage(); //Envoie les dégats à ce qui est touché
+            AimAngle();
+            VisualBulletEffect(); //Effet de ligne atteignant sa cible
+            SendDamage(); //Envoie les dégats à ce qui est touché
 
 
-        LinecastResult = null;
+            LinecastResult = null;
+        }
     }
 
     private Vector2 RandomTargetPositionBetweenBounds()
@@ -575,9 +578,15 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void SendDamage()
     {
+        if (LinecastResult.Count == 0) return;
         RaycastHit2D Target = LinecastResult[0];
 
-//d'abord créer une classe parente puis appeler une fonction receive dedans
+        print("Send from " + gameObject.name);
+
+        if(Target.transform.TryGetComponent(out IDamageable TargetStatus))
+        {
+            TargetStatus.ReceiveDamage(DamageInfo);
+        }
 
     }
 

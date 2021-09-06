@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Cover : MonoBehaviour
+public class Cover : MonoBehaviour, IDamageable
 {
     [Header("Cover Infos")]
     [SerializeField] private float Health;
@@ -36,6 +36,14 @@ public class Cover : MonoBehaviour
     [SerializeField] private bool ProtectHead;
     [SerializeField] private bool ProtectBody;
 
+    #region interface implementation
+
+    public void ReceiveDamage(Utility.StructDamageInfo DamageInfo)
+    {
+        print(this.gameObject.name + " Received Damages");
+    }
+
+    #endregion
 
     #region ExternalSet
     private void ExternalSetAllEntityStruct(GameObject Entity)
