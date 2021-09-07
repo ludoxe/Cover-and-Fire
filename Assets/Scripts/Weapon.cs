@@ -26,8 +26,8 @@ public class Weapon : MonoBehaviour
     [SerializeField] private GameObject AimReferencePoint;
     private float AngleBetweenEntityAndWeaponCanon;
 
-    [Header("Damage Info")]
-    private Utility.StructDamageInfo DamageStats;
+    /*[Header("Damage Info")]
+    private Utility.StructDamageInfo DamageStats;*/
 
     [Header("Other")]
     [SerializeField] private GameObject HeadBone;
@@ -66,7 +66,8 @@ public class Weapon : MonoBehaviour
         GetComponent<StatePhaseEntity>().ShootVariables = ShootStruct;
 
         //Si bug, à déplacer dans une autre méthode non existante
-        GetComponent<StatePhaseEntity>().DamageInfo = DamageStats;
+        GetComponent<StatePhaseEntity>().DamageInfo = WeaponData.GetWeaponDamageStats;
+            
     }
     private void UpdateScript() 
     {

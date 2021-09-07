@@ -527,7 +527,7 @@ public class StatePhaseEntity : MonoBehaviour
                 || GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Targetable"))
                 && GameObjectHit.transform.gameObject != Target) return true;
 
-            //Concerne Target si est une Entity
+            //Concerne Target si est une Entity 
             else if (TargetIsEntity)
             {
 

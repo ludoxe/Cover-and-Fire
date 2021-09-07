@@ -5,7 +5,20 @@ using UnityEngine;
 public class EntityStatus : MonoBehaviour, IDamageable
 {
     [SerializeField] private float MaxHealth = 50;
-    [SerializeField] private float Health = 50;
+    [SerializeField] private float health = 50;
+
+    private float Health
+    {
+        get
+        {
+            return health;
+        }
+        set
+        {
+            health = value;
+            UpdateEntityStatus();
+        }
+    }
 
     #region interface
 
@@ -13,7 +26,6 @@ public class EntityStatus : MonoBehaviour, IDamageable
     {
         SetHealth(DamageInfo.DamageBase * -1);
 
-        print(this.gameObject.name + " Received Damages");
     }
 
     #endregion
@@ -25,8 +37,8 @@ public class EntityStatus : MonoBehaviour, IDamageable
 
     private void UpdateEntityStatus()
     {
-        if (Health <= 0) Die();
-        if (Health > MaxHealth) Health = MaxHealth;
+        if (health <= 0) Die();
+        if (health > MaxHealth) health = MaxHealth;
 
     }
 
@@ -36,7 +48,7 @@ public class EntityStatus : MonoBehaviour, IDamageable
 
     private void Die()
     {
-
+        print("Dying");
     }
 
 

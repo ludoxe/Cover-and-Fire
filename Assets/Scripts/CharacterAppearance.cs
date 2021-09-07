@@ -6,33 +6,36 @@ using UnityEngine;
 public class CharacterAppearance : MonoBehaviour
 
 {
+    [Header("Appareance setting")]
+
     [Tooltip("0 = White Skin ; 1 = Black Skin")][Range(0,1)][SerializeField] private int SkinColor;
     [Tooltip("0 = Female ; 1 = Male")] [Range(0, 1)] [SerializeField] private int Gender;
 
+    [SerializeField] private Data_CustomCharacterPart_Hair HairStyle;
+    [SerializeField] private Sprite EyesStyle;
+
+
     [Space(10)]
 
-    [Header("Swappable Body")]
+    [Header("Customizable Body Parts")]
     [SerializeField] private SpriteRenderer Head;
     [SerializeField] private SpriteRenderer Eyes;
     [SerializeField] private SpriteRenderer FrontHair ;
     [SerializeField] private SpriteRenderer BackHair;
-    
+    [SerializeField] private Material BlackSkin;
+    [SerializeField] private Material WhiteSkin;
+    [SerializeField] private Sprite BlackHead;
+    [SerializeField] private Sprite WhiteHead;
+    [SerializeField] private Sprite FemaleBody;
+    [SerializeField] private Sprite MaleBody;
 
     [SerializeField] private SpriteRenderer Body;
     [SerializeField] private List<SpriteRenderer> BodyPart;
 
-    [Space(10)]
 
-    [Header("Materials and Sprites")]
-    [SerializeField] private Data_CustomCharacterPart_Hair HairStyle;
-    [SerializeField] private Sprite EyesStyle;
-    [SerializeField]private Material BlackSkin;
-    [SerializeField] private Material WhiteSkin;
-    [SerializeField] private Sprite BlackHead;
-    [SerializeField] private Sprite WhiteHead;
 
-    [SerializeField] private Sprite FemaleBody;
-    [SerializeField] private Sprite MaleBody;
+
+
 
 #if UNITY_EDITOR
     private void Update()

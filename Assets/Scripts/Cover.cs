@@ -97,7 +97,7 @@ public class Cover : MonoBehaviour, IDamageable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Player")
+        if(collision.attachedRigidbody && collision.attachedRigidbody.gameObject.tag == "Player")
         {
             if (collision.isTrigger) return;
 
@@ -106,7 +106,7 @@ public class Cover : MonoBehaviour, IDamageable
             if (EntityUsingCover.Count < Capacity)
             {
                 //Définir l'entité
-                var Player = collision.gameObject;
+                var Player = collision.attachedRigidbody.gameObject;
 
                 //Ajouter l'entité dans la liste
                 EntityUsingCover.Add(Player);
