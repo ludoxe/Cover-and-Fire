@@ -378,17 +378,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkinColor: 1
   Gender: 1
+  HairStyle: {fileID: 11400000, guid: b962a9a8a8cae044fa8022f1fb38d545, type: 2}
+  EyesStyle: {fileID: 21300000, guid: ee4c8e924dace5c4aa22f10689611d80, type: 3}
   Head: {fileID: 3814913855537038690}
   Eyes: {fileID: 3814913853918188582}
   FrontHair: {fileID: 3814913854384028446}
   BackHair: {fileID: 3814913854838513505}
-  Body: {fileID: 3814913854116012513}
-  BodyPart:
-  - {fileID: 3814913854219737147}
-  - {fileID: 3814913855181330186}
-  - {fileID: 3814913854911423137}
-  HairStyle: {fileID: 11400000, guid: b962a9a8a8cae044fa8022f1fb38d545, type: 2}
-  EyesStyle: {fileID: 21300000, guid: ee4c8e924dace5c4aa22f10689611d80, type: 3}
   BlackSkin: {fileID: 2100000, guid: a862f7f56f5bd2847aa21b6bc90dcb42, type: 2}
   WhiteSkin: {fileID: 2100000, guid: 7e137d52c04ed8848af85efdf051c30d, type: 2}
   BlackHead: {fileID: 21300000, guid: 787249024211ac545aecef3e2d91da24, type: 3}
@@ -397,6 +392,11 @@ MonoBehaviour:
   FemaleBody: {fileID: 2161142225672563003, guid: 19ab0df6363ff374988fb8ca0e30915a,
     type: 3}
   MaleBody: {fileID: 21300000, guid: 3ffeec989cb33eb4488e0f15d30b8756, type: 3}
+  Body: {fileID: 3814913854116012513}
+  BodyPart:
+  - {fileID: 3814913854219737147}
+  - {fileID: 3814913855181330186}
+  - {fileID: 3814913854911423137}
 --- !u!114 &759036769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,7 +428,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHealth: 50
-  Health: 50
+  health: 50
+  RagdollWhenDieRightOrientation: {fileID: 3814913853621626702, guid: a287fc0e62a5d804097fcad17ec3d295,
+    type: 3}
+  RagdollWhenDieLeftOrientation: {fileID: 2614089374734581607, guid: 1082808d5a9207d4db0ae93bf21c47b9,
+    type: 3}
+  Mainbone: {fileID: 3814913854225586562}
 --- !u!114 &1202260924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -529,7 +534,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3814913853688830226}
-  m_LocalRotation: {x: 0, y: 0, z: 0.52415776, w: 0.85162127}
+  m_LocalRotation: {x: 0, y: 0, z: 0.5578565, w: 0.8299375}
   m_LocalPosition: {x: 0.9201334, y: 0.0000001699961, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1313,8 +1318,8 @@ MonoBehaviour:
   - {fileID: 3814913855303585955}
   - {fileID: 3814913853688830227}
   m_Bounds:
-    m_Center: {x: 0.24077389, y: 0.07739025, z: 0}
-    m_Extent: {x: 0.69895226, y: 0.8696024, z: 0}
+    m_Center: {x: 0.26552156, y: 0.08581507, z: 0}
+    m_Extent: {x: 0.67341834, y: 0.86068535, z: 0}
   m_UseBatching: 1
   m_AlwaysUpdate: 1
 --- !u!1 &3814913854225586562
@@ -1695,13 +1700,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3814913854471645678}
-  m_LocalRotation: {x: -0, y: -0, z: -0.013234611, w: 0.9999125}
+  m_LocalRotation: {x: -0, y: -0, z: -0.04171242, w: 0.99912965}
   m_LocalPosition: {x: 1.01, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3814913853688830227}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 16558.482}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 16555.219}
 --- !u!1 &3814913854637572366
 GameObject:
   m_ObjectHideFlags: 0
@@ -2628,7 +2633,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3814913855303585954}
-  m_LocalRotation: {x: 0, y: 0, z: -0.9819726, w: 0.18902348}
+  m_LocalRotation: {x: 0, y: 0, z: -0.9840966, w: 0.17763446}
   m_LocalPosition: {x: 0.7123646, y: 0.7783588, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2677,7 +2682,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3814913855343461631}
   m_LocalRotation: {x: -0, y: -0, z: -0.728752, w: 0.68477786}
-  m_LocalPosition: {x: -11.436765, y: -0.5394179, z: 0}
+  m_LocalPosition: {x: -11.388482, y: -0.5189842, z: 0}
   m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_Children: []
   m_Father: {fileID: 3814913853859639966}

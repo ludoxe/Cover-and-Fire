@@ -19,6 +19,7 @@ public class Interface_Action : MonoBehaviour
 
     private void Update()
     {
+        if (!PlayerEntity) return;
         StateSelection();
     }
 
@@ -63,7 +64,7 @@ public class Interface_Action : MonoBehaviour
             if (TouchControl.ControlLockerActions == false)
             {
                 if (TouchControl.FingerHold == false) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.InWaitingPosition);
-                else if (TouchControl.FingerHold == true) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.InFire);
+                if (TouchControl.FingerHold == true) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.InFire);
             }
                 return;
 

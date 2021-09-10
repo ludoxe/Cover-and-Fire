@@ -410,11 +410,14 @@ public class StatePhaseEntity : MonoBehaviour
         IEnumerator PlayAnimation()
         {
 
+
             //Jouer une animation
             AnimationClip MyAnimationClip = CoverAnimation.AnimationInFire;
             SelectAnimatorTrueBool("InFire");
 
             yield return null;
+
+            AnimatorStateInfo animatorStateInfo = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
 
             RandomAim = Random.value;
         }
@@ -425,7 +428,6 @@ public class StatePhaseEntity : MonoBehaviour
 
 
     // Concerne les tirs et la visée 
-
 
 
 
@@ -443,6 +445,7 @@ public class StatePhaseEntity : MonoBehaviour
             LinecastResult = null;
         }
     }
+
 
     private Vector2 RandomTargetPositionBetweenBounds()
     {
@@ -502,6 +505,7 @@ public class StatePhaseEntity : MonoBehaviour
     // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste filtrée
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
     {
+
         Target.TryGetComponent(out StatePhaseEntity TargetIsEntity); //Définis le script de l'Entité
         GameObject TargetCover = null;
 
@@ -599,7 +603,7 @@ public class StatePhaseEntity : MonoBehaviour
 
         IEnumerator DestroyBulletLine()
         {
-            yield return new WaitForSeconds(0.03f);
+            yield return new WaitForSeconds(0.05f);
             Destroy(BulletLineGameObject);
         }
     }

@@ -8,7 +8,7 @@ public class CharacterAppearance : MonoBehaviour
 {
     [Header("Appareance setting")]
 
-    [Tooltip("0 = White Skin ; 1 = Black Skin")][Range(0,1)][SerializeField] private int SkinColor;
+    [Tooltip("0 = White Skin ; 1 = Black Skin")] [Range(0, 1)] [SerializeField] private int SkinColor;
     [Tooltip("0 = Female ; 1 = Male")] [Range(0, 1)] [SerializeField] private int Gender;
 
     [SerializeField] private Data_CustomCharacterPart_Hair HairStyle;
@@ -20,7 +20,7 @@ public class CharacterAppearance : MonoBehaviour
     [Header("Customizable Body Parts")]
     [SerializeField] private SpriteRenderer Head;
     [SerializeField] private SpriteRenderer Eyes;
-    [SerializeField] private SpriteRenderer FrontHair ;
+    [SerializeField] private SpriteRenderer FrontHair;
     [SerializeField] private SpriteRenderer BackHair;
     [SerializeField] private Material BlackSkin;
     [SerializeField] private Material WhiteSkin;
@@ -32,7 +32,13 @@ public class CharacterAppearance : MonoBehaviour
     [SerializeField] private SpriteRenderer Body;
     [SerializeField] private List<SpriteRenderer> BodyPart;
 
-
+    public struct StructAppearanceSettingsExported
+    {
+        public int exportedSkinColor;
+        public int exportedGender;
+        public Data_CustomCharacterPart_Hair exportedHairStyle;
+        public Sprite exportedEyesStyle;
+    }
 
 
 
@@ -43,6 +49,28 @@ public class CharacterAppearance : MonoBehaviour
         UpdateChanges();
     }
 #endif
+    public StructAppearanceSettingsExported GetExportedAppearance()
+    {
+        var myStruct = new StructAppearanceSettingsExported();
+
+        myStruct.exportedSkinColor = SkinColor;
+        myStruct.exportedGender = Gender;
+        myStruct.exportedHairStyle = HairStyle;
+        myStruct.exportedEyesStyle = EyesStyle;
+
+        return myStruct;
+    }
+
+    public void SetImportAppearanceSettings(StructAppearanceSettingsExported myStruct)
+    {
+        SkinColor = myStruct.exportedSkinColor;
+        Gender = myStruct.exportedGender;
+        HairStyle = myStruct.exportedHairStyle;
+        EyesStyle = myStruct.exportedEyesStyle;
+    }
+
+
+
     public void GetUpdateChanges()
     {
         UpdateChanges();
@@ -52,6 +80,9 @@ public class CharacterAppearance : MonoBehaviour
     {
         UpdateChanges();
     }
+
+
+
     private void UpdateChanges()
     {
         //Change Hair
@@ -63,7 +94,7 @@ public class CharacterAppearance : MonoBehaviour
         FrontHair.transform.localPosition = new Vector2(FrontHair.transform.localPosition.x, HairStyle.GetYPosition);
 
         //Change Eyes
-        Eyes.sprite = EyesStyle ;
+        Eyes.sprite = EyesStyle;
 
         //Change skin     
         if (SkinColor == 0)
@@ -90,6 +121,9 @@ public class CharacterAppearance : MonoBehaviour
         }
 
     }
+
+
+
 
 }
 

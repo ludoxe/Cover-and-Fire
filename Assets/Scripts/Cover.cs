@@ -40,7 +40,7 @@ public class Cover : MonoBehaviour, IDamageable
 
     public void ReceiveDamage(Utility.StructDamageInfo DamageInfo)
     {
-        print(this.gameObject.name + " Received Damages");
+        Health -= DamageInfo.DamageBase * -1; //A changer
     }
 
     #endregion

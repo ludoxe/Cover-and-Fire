@@ -3,7 +3,9 @@ guid: 5d0064b69ac800e44a460ce9e92ec002
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - RagdollWhenDie: {fileID: 3814913853621626702, guid: a287fc0e62a5d804097fcad17ec3d295,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
