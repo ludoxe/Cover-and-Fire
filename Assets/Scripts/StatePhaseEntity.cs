@@ -263,8 +263,6 @@ public class StatePhaseEntity : MonoBehaviour
         else if (State == EnumState.InWaitingPosition) InWaitingPosition();
         else if (State == EnumState.InAimPosition) InAimPosition();
         else if (State == EnumState.InFire) InFire();
-
-        else Debug.LogError("State Name Invalid");
     }
     private void SetPreviousState()
     {
@@ -291,7 +289,6 @@ public class StatePhaseEntity : MonoBehaviour
 
         IEnumerator PlayAnimation()
         {
-            print("EnterInCover");
             AnimationClip MyAnimationClip = CoverAnimation.AnimationToGetInCover;
 
             //Jouer l'animation pour entrer à couvert
@@ -322,8 +319,6 @@ public class StatePhaseEntity : MonoBehaviour
 
         IEnumerator PlayAnimation()
         {
-            print("InCover");
-
             //Jouer une animation
             AnimationClip MyAnimationClip = CoverAnimation.AnimationInCover;
             animator.CrossFade(MyAnimationClip.name, MyAnimationClip.length / 10);
@@ -339,17 +334,14 @@ public class StatePhaseEntity : MonoBehaviour
         StartCoroutine(PlayAnimation());
         IEnumerator PlayAnimation()
         {
-            print("InWaitingPosition");
+            //Placer ceci pour fonctionner quand on se met à couvert
+            AimVariables.LeftArmTarget.GetComponentInParent<LimbSolver2D>().weight = 1;
 
-            if (previousState != EnumState.InFire)
-            {
-                //Placer ceci pour fonctionner quand on se met à couvert
-                AimVariables.LeftArmTarget.GetComponentInParent<LimbSolver2D>().weight = 1;
-                //Jouer une animation
-                AnimationClip MyAnimationClip = CoverAnimation.AnimationInWaitingPosition;
-                SelectAnimatorTrueBool(MyAnimationClip.name);
+            //Jouer une animation
+            AnimationClip MyAnimationClip = CoverAnimation.AnimationInWaitingPosition;
+            SelectAnimatorTrueBool(MyAnimationClip.name);
 
-            }
+
 
             while (GetState == EnumState.InWaitingPosition)
             {
@@ -374,8 +366,6 @@ public class StatePhaseEntity : MonoBehaviour
 
         IEnumerator PlayAnimation()
         {
-            print("InAimPosition");
-
             //Jouer une animation 
             AnimationClip MyAnimationClip = CoverAnimation.AnimationInAimPosition;
             SelectAnimatorTrueBool("InAimPosition");
@@ -405,6 +395,12 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void InFire()
     {
+        if (Target == null)
+        {
+            SetState(EnumState.InWaitingPosition);
+            return;
+        }
+
         StartCoroutine(PlayAnimation());
         SetIsCovered(false);
         IEnumerator PlayAnimation()
@@ -417,7 +413,7 @@ public class StatePhaseEntity : MonoBehaviour
 
             yield return null;
 
-            AnimatorStateInfo animatorStateInfo = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
+            // float animatorStateDuration = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
 
             RandomAim = Random.value;
         }
@@ -433,9 +429,10 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void Shoot(AnimationEvent myEvent) // Cette fonction s'active dans l'event de l'animation
     {
-        if (myEvent.animatorClipInfo.weight > 0.5f)
+        if (myEvent.animatorClipInfo.weight > 0.5f && Target)
         {
             LinecastResult = SendLinecastToTargetAndConvertToFilteredList(GetIsCovered());
+            if (!Target) return;
 
             AimAngle();
             VisualBulletEffect(); //Effet de ligne atteignant sa cible
@@ -505,7 +502,7 @@ public class StatePhaseEntity : MonoBehaviour
     // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste filtrée
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
     {
-
+        if (!Target) return null;
         Target.TryGetComponent(out StatePhaseEntity TargetIsEntity); //Définis le script de l'Entité
         GameObject TargetCover = null;
 
@@ -514,7 +511,7 @@ public class StatePhaseEntity : MonoBehaviour
 
         string ThisLayerMask = LayerMask.LayerToName(gameObject.layer);
         LayerMask MyLayerMask = LayerMask.GetMask(ThisLayerMask); //Définis le layermask  de l'entité
-        
+
 
         var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras où sont calculés les angles jusqu'à la cible
         List<RaycastHit2D> result = LinecastHitsArray.ToList(); // Convertit LinecastHitsArray en List
