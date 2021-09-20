@@ -41,19 +41,6 @@ public static class Utility
     }
 
     #endregion
-
-    public static Vector3 ConvertRotationFlipToScaleFlipTransform(Transform transform)
-    {
-        float rotationY = transform.rotation.eulerAngles.y;
-        float scaleX = 1;
-        Vector3 TransformScale = transform.localScale;
-
-        if (rotationY == 180) scaleX = -1;
-
-        return new Vector3(TransformScale.x * scaleX, TransformScale.y, TransformScale.z);
-
-    }
-
 }
 
 
@@ -61,4 +48,6 @@ public static class Utility
 public interface IDamageable
 {
     void ReceiveDamage(Utility.StructDamageInfo DamageInfo);
+
+    void SetHealth(float HealthAmount);
 }

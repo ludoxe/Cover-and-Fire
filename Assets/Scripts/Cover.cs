@@ -6,7 +6,8 @@ using UnityEngine.Events;
 public class Cover : MonoBehaviour, IDamageable
 {
     [Header("Cover Infos")]
-    [SerializeField] private float Health;
+    [SerializeField] private float health;
+    [SerializeField] private float MaxHealth;
     [SerializeField] private int Capacity;
     [SerializeField] private bool IsCoverTouchable = true;
     [Range(-1,1)][SerializeField] private int DirectionToUse = 1;
@@ -36,14 +37,45 @@ public class Cover : MonoBehaviour, IDamageable
     [SerializeField] private bool ProtectHead;
     [SerializeField] private bool ProtectBody;
 
+    private float Health
+    {
+        get
+        {
+            return health;
+        }
+        set
+        {
+            health = value;
+            UpdateCoverStatus();
+        }
+    }
+
     #region interface implementation
 
     public void ReceiveDamage(Utility.StructDamageInfo DamageInfo)
     {
-        Health -= DamageInfo.DamageBase * -1; //A changer
+        SetHealth(DamageInfo.DamageBase *-1);
+    }
+
+    public void SetHealth(float AmountHealth)
+    {
+        Health += AmountHealth;
     }
 
     #endregion
+
+    private void UpdateCoverStatus() 
+    {
+        if (health <= 0) DestroyCover();
+        if (health > MaxHealth) health = MaxHealth;
+    }
+
+    private void DestroyCover()
+    {
+        ExitCover();
+        Destroy(this.gameObject);
+    }
+
 
     #region ExternalSet
     private void ExternalSetAllEntityStruct(GameObject Entity)
@@ -136,9 +168,12 @@ public class Cover : MonoBehaviour, IDamageable
     //Appelé quand l'entité quitte la couverture ou quand cette dernière est détruire
     private void ExitCover()
     {
+        List<Transform> NewBoundTargetList = new List<Transform>() { null, null } ;
+
         foreach (GameObject Entity in EntityUsingCover)
         {
             //Désactiver le state EnterInCover de l'entité
+            Entity.GetComponent<StatePhaseEntity>().SetState(EnumState.InWaitingPosition);
 
             //Désactiver la couverture actuelle du joueur
             ExternalSetStatePhaseEntityCover(Entity, null);
@@ -147,7 +182,8 @@ public class Cover : MonoBehaviour, IDamageable
             Entity.GetComponent<BoundTarget>().SetExposedPartOfEntity(true, true);
 
             //Définis la zone de tir de la couverture
-            Entity.GetComponent<BoundTarget>().SetCoverBounds(null);
+            
+            Entity.GetComponent<BoundTarget>().SetCoverBounds(NewBoundTargetList);
         }
     }
 }

@@ -35,12 +35,14 @@ public class EntityStatus : MonoBehaviour, IDamageable
 
     }
 
-    #endregion
-
     public void SetHealth(float AmountHealth)
     {
         Health += AmountHealth;
     }
+
+    #endregion
+
+
 
     private void UpdateEntityStatus()
     {
