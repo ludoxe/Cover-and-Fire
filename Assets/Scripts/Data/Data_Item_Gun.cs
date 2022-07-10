@@ -11,6 +11,9 @@ public class Data_Item_Gun : Data_Item
     [SerializeField] private Vector2 FirstHandGripPosition;
     [SerializeField] private Vector2 SecondHandGripPosition;
 
+    [Header("Animation")]
+    [SerializeField] private RuntimeAnimatorController AnimatorGun;
+
     [Header("Position Element")]
     [SerializeField] private Vector2 CanonPosition;
     [SerializeField] private Vector3 CanonRotation;
@@ -34,6 +37,8 @@ public class Data_Item_Gun : Data_Item
 
     public Vector2 GetCanonPosition { get { return CanonPosition; } }
     public Vector3 GetCanonRotation { get { return CanonRotation; } }
+
+    public RuntimeAnimatorController GetAnimatorGun { get { return AnimatorGun; } }
 
     public Utility.StructDamageInfo GetWeaponDamageStats
     {

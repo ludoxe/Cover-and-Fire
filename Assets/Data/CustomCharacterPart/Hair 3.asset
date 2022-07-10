@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 476a4233a8e4dea4b86e7fb89caf24ea, type: 3}
   m_Name: Hair 3
   m_EditorClassIdentifier: 
-  Name: 
-  Id: 
-  FrontHair: {fileID: -7545751899175342566, guid: 6dbb0c486156359459348b5e3da9e5da,
+  Name: Hair 3
+  Id: 0
+  FrontHair: {fileID: 2624918199986831165, guid: 9276f608ad9b3b948b20ab907eca397b,
     type: 3}
-  BackHair: {fileID: 7935257060447124147, guid: 6dbb0c486156359459348b5e3da9e5da,
+  BackHair: {fileID: 0}
+  ShadowHair: {fileID: 1089460125308657696, guid: 9276f608ad9b3b948b20ab907eca397b,
     type: 3}
-  YPosition: 0
+  YPosition: 0.29
+  XPosition: 0.34

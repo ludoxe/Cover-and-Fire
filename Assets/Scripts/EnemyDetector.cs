@@ -11,7 +11,7 @@ public class EnemyDetector : MonoBehaviour
 
     [Header("Dictionnaire des ennemis")]
     [SerializeField] private List<GameObject> EnemyInTrigger = new List<GameObject>();
-    private Dictionary<GameObject, float> EnemyDetectedDictionary = new Dictionary<GameObject, float>(); // Dictionnaire des tous les ennemis et leur distance, on utilisera le dictionnaire trié
+    private Dictionary<GameObject, float> EnemyDetectedDictionary = new Dictionary<GameObject, float>(); // Dictionnaire des tous les ennemis et leur distance, on utilisera le dictionnaire triï¿½
 
     [Header("Triggers")]
     [SerializeField] private GameObject TriggerDetection;
@@ -37,7 +37,7 @@ public class EnemyDetector : MonoBehaviour
         if (Input.GetKeyUp("u")) ResetEnemyDetector();
     }
 
-    //Utiliser cette fonction si l'entité change de layer Team 
+    //Utiliser cette fonction si l'entitï¿½ change de layer Team 
     private void ResetEnemyDetector()
     {
         ResetAllDictionariesAndLists();
@@ -79,7 +79,7 @@ public class EnemyDetector : MonoBehaviour
         GameObject Enemy = collision.attachedRigidbody.gameObject;
         var myLinecastToTarget = LinecastToTarget(Enemy);
 
-        if (myLinecastToTarget == false) // Si l'ennemi est detecté (rien entre Joueur et ennemi)
+        if (myLinecastToTarget == false) // Si l'ennemi est detectï¿½ (rien entre Joueur et ennemi)
         {
             float EnemyDistance = Vector2.Distance(this.transform.position, Enemy.transform.position);
 
@@ -88,10 +88,10 @@ public class EnemyDetector : MonoBehaviour
                 EnemyDetectedDictionary.Add(Enemy, EnemyDistance);
                 SetEnemiesListToStatePhaseEntity();
             }
-            EnemyDetectedDictionary[Enemy] = EnemyDistance; // S'assure d'actualiser tous les résultats de distance
+            EnemyDetectedDictionary[Enemy] = EnemyDistance; // S'assure d'actualiser tous les rï¿½sultats de distance
 
         }
-        if (myLinecastToTarget == true) // Si l'ennemi n'est pas detecté (obstacle entre Joueur et ennemi)
+        if (myLinecastToTarget == true) // Si l'ennemi n'est pas detectï¿½ (obstacle entre Joueur et ennemi)
         {
             if (EnemyDetectedDictionary.ContainsKey(Enemy))
             {
@@ -116,7 +116,7 @@ public class EnemyDetector : MonoBehaviour
     }
     private RaycastHit2D LinecastToTarget(GameObject Target)
     {
-        LayerMask MyLayerMask = LayerMask.GetMask("Cover","Team1","Team2","Targetable");
+        LayerMask MyLayerMask = LayerMask.GetMask("Cover","Team1","Team2","Targetable","Decor");
         return Physics2D.Linecast(this.transform.position, Target.transform.position, ~MyLayerMask);
     }
 

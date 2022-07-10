@@ -30,6 +30,10 @@ public class Interface_Action : MonoBehaviour
 
         switch (State)
         {
+
+            case EnumState.Running:
+            return;
+            
             case EnumState.EnterInCover:        
             return;
 
@@ -45,6 +49,7 @@ public class Interface_Action : MonoBehaviour
             if (TouchControl.ControlLockerActions == false)
             {
                 if (TouchControl.SwipeDown) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.InCover);
+                else if (TouchControl.SwipeRight) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.ExitCover);
             }
                 return;
 
@@ -67,6 +72,9 @@ public class Interface_Action : MonoBehaviour
                 if (TouchControl.FingerHold == true) PlayerEntity.GetComponent<StatePhaseEntity>().SetState(EnumState.InFire);
             }
                 return;
+
+            case EnumState.ExitCover:
+            return;
 
             default:
                 Debug.LogError(State + " isn't valid");

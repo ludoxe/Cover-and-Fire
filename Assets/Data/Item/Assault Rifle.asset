@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f2543536e71d4c499ee474152910fb7, type: 3}
   m_Name: Assault Rifle
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Assault Riffle
   Id: 
   Logo: {fileID: 21300000, guid: b092c1f625af7314aab975d7e2819168, type: 3}
   sprite: {fileID: 21300000, guid: b092c1f625af7314aab975d7e2819168, type: 3}
   TwoHandsGun: 1
-  GunSpriteLocalPosition: {x: 1, y: 0.1}
+  GunSpriteLocalPosition: {x: 1, y: 0.13}
   FirstHandGripPosition: {x: -0.894, y: -0.037}
   SecondHandGripPosition: {x: 0.152, y: 0.27}
-  CanonPosition: {x: 0, y: 0}
+  AnimatorGun: {fileID: 22100000, guid: 0359f6622c7822e4d8ca3a015f30c61e, type: 2}
+  CanonPosition: {x: 3.06, y: 0.42}
   CanonRotation: {x: 0, y: 0, z: 0}
   WeaponBaseDamage: 10

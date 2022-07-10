@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Custom color Black Skin
-  m_Shader: {fileID: -6465566751694194690, guid: d58d4bfd4ef53c2408e091e27d023c86,
+  m_Shader: {fileID: -6465566751694194690, guid: 1615a12f6b04ed243af40cca6bed7a23,
     type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
@@ -38,6 +38,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_7fc7fe7d8afc4ea8af57df0137a7c69c:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_b5f505a33b634d36ba24fb451821e910:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -78,6 +82,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 94f0beacc74029049875c4a4c3f6e235, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainText:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -131,6 +139,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Boolean_533dc965769b47b18b368cc33dbc5141: 1
+    - Boolean_dd89f70347c442cfb633c80151f52e97: 1
+    - Vector1_0f91b3adb90144748ea820edace0fce6: 1.8
     - Vector1_58979c9e5b2f4e5c9947fcefa529aa8f: 1.8
     - _AlphaClip: 0
     - _Blend: 0
@@ -162,7 +172,11 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - BlackColor: {r: 0.7137255, g: 0.4588236, b: 0.254902, a: 1}
+    - BlackColor: {r: 0.5849056, g: 0.49073216, b: 0.4436454, a: 1}
+    - Color_41780543b6124c26b1aff82210840f91: {r: 0.5849056, g: 0.49899393, b: 0.34983978,
+        a: 0}
+    - Color_af20e691de9546fe9c2073edad5f29b9: {r: 0.9339623, g: 0.76126736, b: 0.8124177,
+        a: 0}
     - WhiteColor: {r: 1, g: 0.9254903, b: 0.9529412, a: 1}
     - _BASE_COLOR: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

@@ -20,6 +20,7 @@ MonoBehaviour:
   GunSpriteLocalPosition: {x: 0.4, y: 0.12}
   FirstHandGripPosition: {x: -0.299, y: -0.099}
   SecondHandGripPosition: {x: 0, y: 0}
+  AnimatorGun: {fileID: 9100000, guid: 46179cd01fdd89e408d2a58dc5e92deb, type: 2}
   CanonPosition: {x: 0.903, y: 0.363}
   CanonRotation: {x: 0, y: 0, z: 0}
   WeaponBaseDamage: 10

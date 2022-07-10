@@ -85,7 +85,7 @@ public class Cover : MonoBehaviour, IDamageable
     }
     private void ExternalSetStatePhaseEntityCoverAnimation(GameObject Entity)
     {
-        //On créer newStruct
+        //On crï¿½er newStruct
         Utility.StructAnimationWithCover newStruct = new Utility.StructAnimationWithCover();
 
         //On assigne les valeurs de newStruct
@@ -101,7 +101,7 @@ public class Cover : MonoBehaviour, IDamageable
     }
     private void ExternalSetStatePhaseEntityCoverCharacterPredifineTransform(GameObject Entity)
     {
-        //On créer newStruct
+        //On crï¿½er newStruct
         Utility.StructCharacterTransform newStruct = new Utility.StructCharacterTransform();
 
         //On assigne les valeurs de newStruct
@@ -132,56 +132,56 @@ public class Cover : MonoBehaviour, IDamageable
         if(collision.attachedRigidbody && collision.attachedRigidbody.gameObject.tag == "Player")
         {
             if (collision.isTrigger) return;
+            
+            //Dï¿½finir l'entitï¿½
+            var Player = collision.attachedRigidbody.gameObject;
 
-           
-
+            if(Player.GetComponent<StatePhaseEntity>().GetWalkingDirection() != DirectionToUse) return;
+            
             if (EntityUsingCover.Count < Capacity)
             {
-                //Définir l'entité
-                var Player = collision.attachedRigidbody.gameObject;
-
-                //Ajouter l'entité dans la liste
+                //Ajouter l'entitï¿½ dans la liste
                 EntityUsingCover.Add(Player);
 
-                //Définir les structs de l'entité
+                //Dï¿½finir les structs de l'entitï¿½
                 ExternalSetAllEntityStruct(Player);
 
-                //Activer le state EnterInCover de l'entité
+                //Activer le state EnterInCover de l'entitï¿½
                 Player.GetComponent<StatePhaseEntity>().SetState(EnumState.EnterInCover) ;
 
-                //Définis la couverture actuelle du joueur
+                //Dï¿½finis la couverture actuelle du joueur
                 ExternalSetStatePhaseEntityCover(Player, this.gameObject);
 
-                //Définis la couverture comme touchable ou non
+                //Dï¿½finis la couverture comme touchable ou non
                 ExternalSetStatePhaseEntityIsCoverTouchable(Player, IsCoverTouchable);
 
-                //Définir les zones exposées de la couverture
+                //Dï¿½finir les zones exposï¿½es de la couverture
                 Player.GetComponent<BoundTarget>().SetExposedPartOfEntity(!ProtectHead, !ProtectBody);
 
-                //Définis la zone de tir de la couverture
+                //Dï¿½finis la zone de tir de la couverture
                 Player.GetComponent<BoundTarget>().SetCoverBounds(CoverBounds);
 
             }
 
         }
     }
-    //Appelé quand l'entité quitte la couverture ou quand cette dernière est détruire
+    //Appelï¿½ quand l'entitï¿½ quitte la couverture ou quand cette derniï¿½re est dï¿½truire
     private void ExitCover()
     {
         List<Transform> NewBoundTargetList = new List<Transform>() { null, null } ;
 
         foreach (GameObject Entity in EntityUsingCover)
         {
-            //Désactiver le state EnterInCover de l'entité
+            //Dï¿½sactiver le state EnterInCover de l'entitï¿½
             Entity.GetComponent<StatePhaseEntity>().SetState(EnumState.InWaitingPosition);
 
-            //Désactiver la couverture actuelle du joueur
+            //Dï¿½sactiver la couverture actuelle du joueur
             ExternalSetStatePhaseEntityCover(Entity, null);
 
-            //Définir les zones exposées de la couverture
+            //Dï¿½finir les zones exposï¿½es de la couverture
             Entity.GetComponent<BoundTarget>().SetExposedPartOfEntity(true, true);
 
-            //Définis la zone de tir de la couverture
+            //Dï¿½finis la zone de tir de la couverture
             
             Entity.GetComponent<BoundTarget>().SetCoverBounds(NewBoundTargetList);
         }

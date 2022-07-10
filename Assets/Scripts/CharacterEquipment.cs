@@ -20,12 +20,6 @@ public class CharacterEquipment : MonoBehaviour
     [SerializeField] private GameObject LeftArmTarget;
     [SerializeField] private GameObject RightArmTarget;
 
-
-    private void Awake()
-    {
-        SetWeaponPlayer();
-    }
-
     private void OnValidate()
     {
         UpdateChanges();
@@ -33,6 +27,8 @@ public class CharacterEquipment : MonoBehaviour
 
     private void UpdateChanges()
     {
+         SetWeaponPlayer();
+
         GunSpriteRenderer.sprite = Gun.GetSprite;
         GunSpriteRenderer.transform.localPosition = Gun.GetGunSpriteLocalPosition;
 
@@ -51,6 +47,7 @@ public class CharacterEquipment : MonoBehaviour
 
     private void SetWeaponPlayer()
     {
+        if(GetComponent<Weapon>())
         GetComponent<Weapon>().SetWeapon = Gun ;
     }
 

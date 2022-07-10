@@ -7,11 +7,13 @@ using System.Linq;
 
 public enum EnumState
 {
+    Running,
     EnterInCover,
     InCover,
     InWaitingPosition,
     InAimPosition,
-    InFire
+    InFire,
+    ExitCover
 }
 
 public class StatePhaseEntity : MonoBehaviour
@@ -34,9 +36,11 @@ public class StatePhaseEntity : MonoBehaviour
      */
 
     [Header("State")]
-    private EnumState State = EnumState.InCover;
+    private EnumState State = EnumState.Running;
     private EnumState previousState;
-    [SerializeField] [Range(0, 1)] private int WalkingDirection = 1;
+    [SerializeField] [Range(-1, 1)] private int WalkingDirection = 1;
+    [SerializeField] private float SpeedMovement = 2 ;
+
 
     [Header("Cover Info")]
     private bool IsCovered = false;
@@ -95,7 +99,7 @@ public class StatePhaseEntity : MonoBehaviour
         {
             int result = -1;
 
-            //Définir le layer des ennemis
+            //Dï¿½finir le layer des ennemis
             if (gameObject.layer == LayerMask.NameToLayer("Team1")) result = LayerMask.NameToLayer("Team2");
             if (gameObject.layer == LayerMask.NameToLayer("Team2")) result = LayerMask.NameToLayer("Team1");
             return result;
@@ -131,6 +135,17 @@ public class StatePhaseEntity : MonoBehaviour
         return TargetBoundsListForAim;
     }
 
+    public int GetWalkingDirection()
+    {
+        return WalkingDirection;
+    }
+
+    /*  pour quand on dev l'IA
+    public List<GameObject> GetEnemiesList() 
+    {
+        return EnemiesList ;
+    }
+    */
     #endregion
 
     #region Public Set
@@ -148,7 +163,7 @@ public class StatePhaseEntity : MonoBehaviour
     /// <param name="increment">set to +1 to target next enemy or -1 to target previous enemy </param>
     public void SetEnemySelectedByIncrement(int increment)
     {
-        if (EnemiesList.Contains(Target)) SetEnemySeletor(EnemiesList.IndexOf(Target) + increment);//Si dans la liste, l'ennemi selectionné est le même, on rajoute ensuite le nombre désiré par les paramètres
+        if (EnemiesList.Contains(Target)) SetEnemySeletor(EnemiesList.IndexOf(Target) + increment);//Si dans la liste, l'ennemi selectionnï¿½ est le mï¿½me, on rajoute ensuite le nombre dï¿½sirï¿½ par les paramï¿½tres
         UpdateSelectedEnemy();
     }
     public void SetEnemySelectedByGameObject(GameObject gameObject)
@@ -191,8 +206,11 @@ public class StatePhaseEntity : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Cover"), gameObject.layer);
+        SetState(GetState);
 
     }
+
+    //Concerne la sÃ©lection des ennemis
 
     private void InternalSetCacheTargetBoundsListsByAccessToGetUncoverBoundsTarget()
     {
@@ -201,22 +219,22 @@ public class StatePhaseEntity : MonoBehaviour
 
         if (Target.TryGetComponent(out BoundTarget BoundTarget))
         {
-            //Visera les parties exposés de l'ennemi
+            //Visera les parties exposï¿½s de l'ennemi
             CacheTargetBoundsListUncovered = BoundTarget.GetBoundsTargetWhenUncover();
-            //Visera les parties exposés de l'ennemi si la couverture n'a pas de bounds
+            //Visera les parties exposï¿½s de l'ennemi si la couverture n'a pas de bounds
             if (BoundTarget.GetCoverBounds() == null) CacheCoverBoundsList = CacheTargetBoundsListUncovered;
             //Visera la couverture
             else CacheCoverBoundsList = BoundTarget.GetCoverBounds();
         }
 
 
-        // S'il n'y a pas de TargetBounds, mets les TargetsBounds en null (par inférence, revient à définir la cible comme la position du Target, cf RandomTargetPositionBetweenBounds() )
+        // S'il n'y a pas de TargetBounds, mets les TargetsBounds en null (par infï¿½rence, revient ï¿½ dï¿½finir la cible comme la position du Target, cf RandomTargetPositionBetweenBounds() )
         else
         {
-            //Créer la nouvelle liste CacheTargetBoundsListCovered
+            //Crï¿½er la nouvelle liste CacheTargetBoundsListCovered
             CacheCoverBoundsList = new List<Transform>(2) { null, null };
 
-            //Créer la nouvelle liste CacheTargetBoundsListUncovered
+            //Crï¿½er la nouvelle liste CacheTargetBoundsListUncovered
             CacheTargetBoundsListUncovered = new List<Transform>(2) { null, null };
         }
     }
@@ -239,13 +257,17 @@ public class StatePhaseEntity : MonoBehaviour
         else
             Target = null;
     }
+
+    //Concerne l'animator
     private void SelectAnimatorTrueBool(string BoolName)
     {
+        animator.SetBool("Running", false);
         animator.SetBool("EnterInCover", false);
         animator.SetBool("InCover", false);
         animator.SetBool("InWaitingPosition", false);
         animator.SetBool("InAimPosition", false);
         animator.SetBool("InFire", false);
+        animator.SetBool("ExitCover", false);
 
         animator.SetBool(BoolName, true);
     }
@@ -258,11 +280,13 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void ChangeState()
     {
-        if (State == EnumState.EnterInCover) EnterInCover();
+        if (State == EnumState.Running) Running(); 
+        else if (State == EnumState.EnterInCover) EnterInCover();
         else if (State == EnumState.InCover) InCover();
         else if (State == EnumState.InWaitingPosition) InWaitingPosition();
         else if (State == EnumState.InAimPosition) InAimPosition();
         else if (State == EnumState.InFire) InFire();
+        else if (State == EnumState.ExitCover) ExitCover();
     }
     private void SetPreviousState()
     {
@@ -278,7 +302,23 @@ public class StatePhaseEntity : MonoBehaviour
 
 
     #region States
-
+    private void Running()
+    {
+        SetIsCovered(false);
+        StartCoroutine(PlayAnimation());
+        IEnumerator PlayAnimation()
+        {
+            //Jouer une animation
+            animator.CrossFade("Running", 0.01f);
+            SelectAnimatorTrueBool("Running");
+            while(GetIsCovered() == false ) 
+            {
+                transform.Translate(new Vector3(1,0,0)*Time.deltaTime *SpeedMovement) ;
+                yield return null;
+            }
+            yield return null;
+        }
+    }
     private void EnterInCover()
     {
         PlacePlayerToFaceWithCover();
@@ -291,15 +331,15 @@ public class StatePhaseEntity : MonoBehaviour
         {
             AnimationClip MyAnimationClip = CoverAnimation.AnimationToGetInCover;
 
-            //Jouer l'animation pour entrer à couvert
-            animator.CrossFade(MyAnimationClip.name, 0.3f);
+            //Jouer l'animation pour entrer ï¿½ couvert
+            animator.CrossFade(MyAnimationClip.name, 0.01f);
 
-            //S'assure que le joueur ne fait change pas d'Etat pendant l'opération
+            //S'assure que le joueur ne fait change pas d'Etat pendant l'opï¿½ration
             TouchControl.SetLockControlActions(true);
             yield return new WaitForSeconds(MyAnimationClip.length);
             TouchControl.SetLockControlActions(false);
 
-            //Placer l'entité en position 
+            //Placer l'entitï¿½ en position 
             transform.position = CoverCharacterPredifineTransform.PositionInCover;
 
             SetState(EnumState.InCover);
@@ -309,7 +349,7 @@ public class StatePhaseEntity : MonoBehaviour
     {
         PlacePlayerToFaceWithCover();
         SetIsCovered(true);
-        //Laisse l'entité face ou dos à l'ennemi
+        //Laisse l'entitï¿½ face ou dos ï¿½ l'ennemi
         if (CoverCharacterPredifineTransform.IsFacingEnnemyInCover == false)
         {
             transform.localEulerAngles = new Vector2(0, transform.localEulerAngles.y + 180);
@@ -334,14 +374,11 @@ public class StatePhaseEntity : MonoBehaviour
         StartCoroutine(PlayAnimation());
         IEnumerator PlayAnimation()
         {
-            //Placer ceci pour fonctionner quand on se met à couvert
+            //Placer ceci pour fonctionner quand on se met ï¿½ couvert
             AimVariables.LeftArmTarget.GetComponentInParent<LimbSolver2D>().weight = 1;
 
             //Jouer une animation
-            AnimationClip MyAnimationClip = CoverAnimation.AnimationInWaitingPosition;
-            SelectAnimatorTrueBool(MyAnimationClip.name);
-
-
+            SelectAnimatorTrueBool("InWaitingPosition");
 
             while (GetState == EnumState.InWaitingPosition)
             {
@@ -361,30 +398,27 @@ public class StatePhaseEntity : MonoBehaviour
         PlacePlayerToFaceWithCover();
         SetIsCovered(false);
 
-        StartCoroutine(UpdateAimAngle());//Mettre l'angle de l'animation à jour
+        StartCoroutine(UpdateAimAngle());//Mettre l'angle de l'animation ï¿½ jour
         StartCoroutine(PlayAnimation());
 
         IEnumerator PlayAnimation()
         {
             //Jouer une animation 
-            AnimationClip MyAnimationClip = CoverAnimation.AnimationInAimPosition;
             SelectAnimatorTrueBool("InAimPosition");
-
-            yield return new WaitForSeconds(MyAnimationClip.length);
 
             yield return null;
         }
 
         IEnumerator UpdateAimAngle()
         {
-            //Définis une valeur random entre 0 et 1 qui sera appliqué sur AimAngle()
+            //Dï¿½finis une valeur random entre 0 et 1 qui sera appliquï¿½ sur AimAngle()
             RandomAim = Random.value;
 
             while (GetState == EnumState.InAimPosition)
             {
-                UpdateSelectedEnemy(); //Mettre à jour la target pour l'animation de visée
+                UpdateSelectedEnemy(); //Mettre ï¿½ jour la target pour l'animation de visï¿½e
 
-                InternalSetCacheTargetBoundsListsByAccessToGetUncoverBoundsTarget(); //définis la zone de tir possible pour toucher l'ennemi ou sa couverture
+                InternalSetCacheTargetBoundsListsByAccessToGetUncoverBoundsTarget(); //dï¿½finis la zone de tir possible pour toucher l'ennemi ou sa couverture
 
                 AimAngle();
                 yield return null;
@@ -408,14 +442,35 @@ public class StatePhaseEntity : MonoBehaviour
 
 
             //Jouer une animation
-            AnimationClip MyAnimationClip = CoverAnimation.AnimationInFire;
             SelectAnimatorTrueBool("InFire");
 
             yield return null;
 
-            // float animatorStateDuration = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
-
             RandomAim = Random.value;
+        }
+    }
+
+    private void ExitCover()
+    {
+        PlacePlayerToFaceWithCover();
+
+        SetIsCovered(false);
+
+        StartCoroutine(PlayAnimation());
+
+        IEnumerator PlayAnimation()
+        {
+            AnimationClip MyAnimationClip = CoverAnimation.AnimationToGetOutCover;
+
+            //Jouer l'animation pour sortir de couverture
+            animator.CrossFade(MyAnimationClip.name, 0.01f);
+
+            //S'assure que le joueur ne fait change pas d'Etat pendant l'opï¿½ration
+            TouchControl.SetLockControlActions(true);
+            yield return new WaitForSeconds(MyAnimationClip.length);
+            TouchControl.SetLockControlActions(false);
+
+            SetState(EnumState.Running);
         }
     }
 
@@ -423,7 +478,7 @@ public class StatePhaseEntity : MonoBehaviour
 
 
 
-    // Concerne les tirs et la visée 
+    // Concerne les tirs et la visï¿½e 
 
 
 
@@ -436,7 +491,7 @@ public class StatePhaseEntity : MonoBehaviour
 
             AimAngle();
             VisualBulletEffect(); //Effet de ligne atteignant sa cible
-            SendDamage(); //Envoie les dégats à ce qui est touché
+            SendDamage(); //Envoie les dï¿½gats ï¿½ ce qui est touchï¿½
 
 
             LinecastResult = null;
@@ -448,7 +503,7 @@ public class StatePhaseEntity : MonoBehaviour
     {
         if (Target == null)
         {
-            //Remplacer cela par un tir général sur la couverture 
+            //Remplacer cela par un tir gï¿½nï¿½ral sur la couverture 
 
             Debug.LogError("Target is null");
             return new Vector2();
@@ -460,23 +515,23 @@ public class StatePhaseEntity : MonoBehaviour
             TargetBoundsListForAim[1] = Target.transform;
         }
 
-        Vector2 VectorDirectionBetweenTargetBounds = TargetBoundsListForAim[1].position - TargetBoundsListForAim[0].position; //Récupère la direction entre les deux boundstarget
+        Vector2 VectorDirectionBetweenTargetBounds = TargetBoundsListForAim[1].position - TargetBoundsListForAim[0].position; //Rï¿½cupï¿½re la direction entre les deux boundstarget
         Vector2 RandomTargetPositionBetweenBounds = (Vector2)TargetBoundsListForAim[0].position + RandomAim * VectorDirectionBetweenTargetBounds; //On part de LowerBounds, et on rajoute entre 0 et 1 * la direction vers Upper
         return RandomTargetPositionBetweenBounds;
     }
 
-    private void AimAngle() //Défini l'angle du bras pour lors du tir ou de la visée
+    private void AimAngle() //Dï¿½fini l'angle du bras pour lors du tir ou de la visï¿½e
     {
         if (Target == null) return; //Ne fonctionne pas sans Target
 
-        //Système de visée
+        //Systï¿½me de visï¿½e
         Transform AimReferencePoint = AimVariables.AimReferencePoint.transform;
         Vector2 TargetPosition = RandomTargetPositionBetweenBounds();
         Vector3 AngleRightDirection = Vector2.right;
         Vector3 AngleLeftDirection = Vector2.left;
         Transform WeaponCanon = ShootVariables.WeaponCanon.transform;
 
-        //Calibration de la visée en fonction de l'arme
+        //Calibration de la visï¿½e en fonction de l'arme
         Vector3 Calibration = WeaponCanon.position - AimReferencePoint.position;
         Vector3 TargetWithCalibration = ((Vector3)TargetPosition + Calibration * -1);
 
@@ -488,42 +543,45 @@ public class StatePhaseEntity : MonoBehaviour
         else // Si le joueur regarde vers la gauche
             Angle = Vector2.Angle(AngleLeftDirection, TargetWithCalibration - AimReferencePoint.position);
 
-        //Détermine Angle négatif si la cible est en bas 
+        //Dï¿½termine Angle nï¿½gatif si la cible est en bas 
         if (TargetWithCalibration.y < AimReferencePoint.position.y) Angle *= -1;
 
-        //return si Angle dépasse l'intervalle de angle direction
+        //return si Angle dï¿½passe l'intervalle de angle direction
         if (Angle < -60 || Angle > 60) return;
 
-        //Défini l'angle de l'animator pour correspondre à l'angle pour viser l'ennemi
+        //Dï¿½fini l'angle de l'animator pour correspondre ï¿½ l'angle pour viser l'ennemi
         GetComponent<Animator>().SetFloat("angle direction", Angle);
     }
 
 
-    // Lance une linecast de l'entité jusqu'à la cible, retourne une Liste filtrée
+    // Lance une linecast de l'entitï¿½ jusqu'ï¿½ la cible, retourne une Liste filtrï¿½e
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
     {
         if (!Target) return null;
-        Target.TryGetComponent(out StatePhaseEntity TargetIsEntity); //Définis le script de l'Entité
+        Target.TryGetComponent(out StatePhaseEntity TargetIsEntity); //Dï¿½finis le script de l'Entitï¿½
         GameObject TargetCover = null;
 
-        if (TargetIsEntity) TargetCover = TargetIsEntity.GetCover(); //Si une entité, défini Cover de Target pour l'utiliser dans Predicate();
+        if (TargetIsEntity) TargetCover = TargetIsEntity.GetCover(); //Si une entitï¿½: dï¿½fini Cover de Target pour l'utiliser dans Predicate();
         Transform AimReferencePoint = AimVariables.AimReferencePoint.transform;
 
         string ThisLayerMask = LayerMask.LayerToName(gameObject.layer);
-        LayerMask MyLayerMask = LayerMask.GetMask(ThisLayerMask); //Définis le layermask  de l'entité
+        LayerMask MyLayerMask = LayerMask.GetMask(ThisLayerMask); //Dï¿½finis le layermask  de l'entitï¿½
 
 
-        var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras où sont calculés les angles jusqu'à la cible
+        var LinecastHitsArray = Physics2D.LinecastAll(AimReferencePoint.position, RandomTargetPositionBetweenBounds(), ~MyLayerMask); // linecast qui va du bras oï¿½ sont calculï¿½s les angles jusqu'ï¿½ la cible
         List<RaycastHit2D> result = LinecastHitsArray.ToList(); // Convertit LinecastHitsArray en List
 
-        result.RemoveAll(Predicate); //supprime tous les ennemis et targets qui ne sont pas la Target et la Target, si celle ci est en couverture complète
+        result.RemoveAll(Predicate); //supprime tous les ennemis, targets, et dÃ©cor qui ne sont pas la Target, si celle ci est en couverture complï¿½te
 
         return result; // on transforme la LinecastHit en List
 
         bool Predicate(RaycastHit2D GameObjectHit)
         {
+            //Si les gameobjects hits sont des Ã©mÃ©ments de dÃ©cor
+            if(GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Decor")) return true;
+
             //Si les gameobjects hits sont EnemiesLayer ou TargetableLayer et en plus, si n'est pas la Target
-            //On appellera tout le temps cette condition quand la cible est à découvert
+            //On appellera tout le temps cette condition quand la cible est ï¿½ dï¿½couvert
             if ((GameObjectHit.transform.gameObject.layer == EnemiesLayer
                 || GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Targetable"))
                 && GameObjectHit.transform.gameObject != Target) return true;
@@ -533,12 +591,12 @@ public class StatePhaseEntity : MonoBehaviour
             {
 
                 //Si les gameObjects hits sont des covers et en plus, ne sont pas la cover de Target, et les arguments de la fonction FilterLinecastFromCover sont sur faux
-                //On l'appelle quand on veut toucher la couverture de l'ennemi car la cible est à couvert
+                //On l'appelle quand on veut toucher la couverture de l'ennemi car la cible est ï¿½ couvert
                 if (GameObjectHit.transform.gameObject.layer == LayerMask.NameToLayer("Cover") && GameObjectHit.transform.gameObject != TargetCover && !FilterLinecastFromCover) return true;
 
 
-                //Si les gameobjects hits sont la target, et que target est à couvert 
-                //On l'appelle quand on ne veut rien toucher car la cible est à couvert
+                //Si les gameobjects hits sont la target, et que target est ï¿½ couvert 
+                //On l'appelle quand on ne veut rien toucher car la cible est ï¿½ couvert
                 else if (GameObjectHit.transform.gameObject == Target && TargetIsEntity.GetIsCovered())
                 {
                     return true;
@@ -568,7 +626,7 @@ public class StatePhaseEntity : MonoBehaviour
 
         var BulletLineGameObject = Instantiate(BulletWeaponLineCache, new Vector2(), new Quaternion());
 
-        BulletLineGameObject.SetActive(true); // Active le gameObject pour y accéder dans la variable ci dessous + initialiser le GO
+        BulletLineGameObject.SetActive(true); // Active le gameObject pour y accï¿½der dans la variable ci dessous + initialiser le GO
         var BulletLine = BulletLineGameObject.GetComponent<LineRenderer>();
 
 
@@ -577,20 +635,20 @@ public class StatePhaseEntity : MonoBehaviour
         {
             RaycastHit2D Target = LinecastResult[0];
 
-            //déplace le transform de BulletLineGameObject et donc du point de référence de LineRenderer pour avoir une destination globale
+            //dï¿½place le transform de BulletLineGameObject et donc du point de rï¿½fï¿½rence de LineRenderer pour avoir une destination globale
             BulletLineGameObject.transform.position = new Vector2();
 
-            //Set les points de la line renderer du canon à cible
+            //Set les points de la line renderer du canon ï¿½ cible
             BulletLine.SetPosition(0, WeaponCanon.position);
             BulletLine.SetPosition(1, Target.point);
         }
 
         if (LinecastResult.Count == 0)
         {
-            //déplace le transform de BulletLineGameObject et donc du point de référence de LineRenderer pour avoir une destination locale
+            //dï¿½place le transform de BulletLineGameObject et donc du point de rï¿½fï¿½rence de LineRenderer pour avoir une destination locale
             BulletLineGameObject.transform.position = WeaponCanon.position;
 
-            //Les Bullets Line prennent les coordonnées locales du BulletLineGameObject + set les points de la line renderer pour tirer en ligne droite
+            //Les Bullets Line prennent les coordonnï¿½es locales du BulletLineGameObject + set les points de la line renderer pour tirer en ligne droite
             BulletLine.SetPosition(0, new Vector2());
             BulletLine.SetPosition(1, (WeaponCanon.right * 500));
 

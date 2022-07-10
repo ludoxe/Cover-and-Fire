@@ -26,9 +26,6 @@ public class Weapon : MonoBehaviour
     [SerializeField] private GameObject AimReferencePoint;
     private float AngleBetweenEntityAndWeaponCanon;
 
-    /*[Header("Damage Info")]
-    private Utility.StructDamageInfo DamageStats;*/
-
     [Header("Other")]
     [SerializeField] private GameObject HeadBone;
     [SerializeField] private GameObject Target;
@@ -65,14 +62,20 @@ public class Weapon : MonoBehaviour
         GetComponent<StatePhaseEntity>().AimVariables = AimStruct;
         GetComponent<StatePhaseEntity>().ShootVariables = ShootStruct;
 
-        //Si bug, à déplacer dans une autre méthode non existante
+        //Si bug, deplacer dans une autre methode non existante
         GetComponent<StatePhaseEntity>().DamageInfo = WeaponData.GetWeaponDamageStats;
             
     }
+    private void ExternalSetAnimator()
+    {
+         GetComponent<Animator>().runtimeAnimatorController = WeaponData.GetAnimatorGun ;
+    }
+
     private void UpdateScript() 
     {
         if (WeaponData == null) return;
 
+        ExternalSetAnimator();
         ExternalSetStatePhaseEntityStructVariables(); //Si bug, supprimer cette ligne
 
         FirstHandGripGameObject.transform.localPosition = WeaponData.GetFirstHandGripPosition;
