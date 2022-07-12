@@ -35,6 +35,9 @@ public class StatePhaseEntity : MonoBehaviour
      * Verifier
      */
 
+    [Header("Id")]
+    [SerializeField] private bool IsPlayer = false;
+
     [Header("State")]
     private EnumState State = EnumState.Running;
     private EnumState previousState;
@@ -138,6 +141,11 @@ public class StatePhaseEntity : MonoBehaviour
     public int GetWalkingDirection()
     {
         return WalkingDirection;
+    }
+
+    public bool GetIsPlayer()
+    {
+        return IsPlayer;
     }
 
     /*  pour quand on dev l'IA
@@ -304,6 +312,8 @@ public class StatePhaseEntity : MonoBehaviour
     #region States
     private void Running()
     {
+        if (GetIsPlayer()) CameraManager.Singleton.CenterToPlayer();
+
         SetIsCovered(false);
         StartCoroutine(PlayAnimation());
         IEnumerator PlayAnimation()
@@ -347,6 +357,8 @@ public class StatePhaseEntity : MonoBehaviour
     }
     private void InCover()
     {
+        if(GetIsPlayer()) CameraManager.Singleton.CenterBetweenAllActors();
+
         PlacePlayerToFaceWithCover();
         SetIsCovered(true);
         //Laisse l'entit� face ou dos � l'ennemi
@@ -452,6 +464,8 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void ExitCover()
     {
+        if (GetIsPlayer()) CameraManager.Singleton.CenterToPlayer();
+
         PlacePlayerToFaceWithCover();
 
         SetIsCovered(false);
