@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public static class Utility 
 {
@@ -38,6 +39,24 @@ public static class Utility
     public struct StructDamageInfo
     {
         internal float DamageBase;
+    }
+
+    #endregion
+
+    #region Methods
+
+    public static bool CompareContentsListsIsDifferent<T>(List<T> List1, List<T> List2)
+    {
+        if(List1.Count != List2.Count) return true;
+
+        for (int i = 0; i < List1.Count; i++)
+        {
+            if (List1[i] == null || List2[i] == null ) return true;
+            
+            if(!List1[i].Equals(List2[i])) return true;
+        }
+        return false;
+
     }
 
     #endregion
