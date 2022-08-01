@@ -1,0 +1,145 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Linq;
+
+public class EnemyDetector : MonoBehaviour
+{
+    [Header("Debug")]
+    public List<GameObject> DebugEnemy;
+    public List<float> DebugEnemyDistance;
+
+    [Header("Dictionnaire des ennemis")]
+    [SerializeField] private List<GameObject> EnemyInTrigger = new List<GameObject>();
+    private Dictionary<GameObject, float> EnemyDetectedDictionary = new Dictionary<GameObject, float>(); // Dictionnaire des tous les ennemis et leur distance, on utilisera le dictionnaire tri�
+
+    [Header("Triggers")]
+    [SerializeField] private GameObject TriggerDetection;
+
+    public void SetEnemiesListToStatePhaseEntity()
+    {
+        //Trie par ordre croissant des Values distance, les Keys ennemies, puis converti le dico en List
+        List<GameObject> MyNewList = EnemyDetectedDictionary.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+
+        GetComponent<StatePhaseEntity>().ReceiveEnemiesList(MyNewList);
+    }
+
+    private void Update() //Debug purpose only
+    {
+        //debug only
+        DebugEnemy = new List<GameObject>(); DebugEnemyDistance = new List<float>();
+        foreach (KeyValuePair<GameObject, float> Pair in EnemyDetectedDictionary)
+        {
+            DebugEnemy.Add(Pair.Key);
+            DebugEnemyDistance.Add(Pair.Value);
+        }
+
+        if (Input.GetKeyUp("u")) ResetEnemyDetector();
+    }
+
+    //Utiliser cette fonction si l'entit� change de layer Team 
+    private void ResetEnemyDetector()
+    {
+        ResetAllDictionariesAndLists();
+        ResetTriggerDetection();
+        SetEnemiesListToStatePhaseEntity();
+    }
+
+    private void ResetAllDictionariesAndLists()
+    {
+        EnemyInTrigger = new List<GameObject>();
+        EnemyDetectedDictionary = new Dictionary<GameObject, float>();
+    }
+
+    private void ResetTriggerDetection()
+    {
+        TriggerDetection.GetComponent<Collider2D>().enabled = false;
+        TriggerDetection.GetComponent<Collider2D>().enabled = true;
+    }
+
+
+    private void OnTriggerEnter2D(Collider2D collision) // Fait rentrer les gameObject dans EnemyInTrigger
+    {
+        if (collision.isTrigger) return; // Cette fonction ne s'active pas lorsqu'on rentre en contact avec un trigger
+        if (collision.attachedRigidbody == null) return;
+        if (collision.attachedRigidbody.gameObject.layer != EnemiesLayer && collision.attachedRigidbody.gameObject.layer != LayerMask.NameToLayer("Targetable")) return; 
+        //e
+        GameObject Enemy = collision.attachedRigidbody.gameObject;
+        if(!EnemyInTrigger.Contains(Enemy))
+        EnemyInTrigger.Add(Enemy);
+
+        SetEnemiesListToStatePhaseEntity();
+    }
+
+    private void OnTriggerStay2D(Collider2D collision) //Fait entrer ou sortir les gameObject de EnemyIntrigger dans EnemyDetectedDictionary
+    {
+        if (collision.attachedRigidbody == null) return;
+        if (!EnemyInTrigger.Contains(collision.attachedRigidbody.gameObject)) return;
+
+        GameObject Enemy = collision.attachedRigidbody.gameObject;
+        var myLinecastToTarget = LinecastToTarget(Enemy);
+
+        if (myLinecastToTarget == false) // Si l'ennemi est detect� (rien entre Joueur et ennemi)
+        {
+            float EnemyDistance = Vector2.Distance(this.transform.position, Enemy.transform.position);
+
+            if (!EnemyDetectedDictionary.ContainsKey(Enemy))
+            {
+                EnemyDetectedDictionary.Add(Enemy, EnemyDistance);
+                SetEnemiesListToStatePhaseEntity();
+            }
+            EnemyDetectedDictionary[Enemy] = EnemyDistance; // S'assure d'actualiser tous les r�sultats de distance
+
+        }
+        if (myLinecastToTarget == true) // Si l'ennemi n'est pas detect� (obstacle entre Joueur et ennemi)
+        {
+            if (EnemyDetectedDictionary.ContainsKey(Enemy))
+            {
+                EnemyDetectedDictionary.Remove(Enemy);
+                SetEnemiesListToStatePhaseEntity();
+            }
+        }
+
+        
+
+    }
+
+    private void OnTriggerExit2D(Collider2D collision) // Fait sortir les gameObject de EnemyInTrigger
+    {
+        if (collision.isTrigger) return; // Cette fonction ne s'active pas lorsqu'on rentre en contact avec un trigger
+        if (collision.attachedRigidbody == null) return;
+        if (collision.attachedRigidbody.gameObject != null && collision.attachedRigidbody.gameObject.layer != EnemiesLayer && collision.attachedRigidbody.gameObject.layer != LayerMask.NameToLayer("Targetable")) return;
+
+        GameObject Enemy = collision.attachedRigidbody.gameObject;
+        RemoveEnemyFromScript(Enemy);
+        SetEnemiesListToStatePhaseEntity();
+    }
+    private RaycastHit2D LinecastToTarget(GameObject Target)
+    {
+        LayerMask MyLayerMask = LayerMask.GetMask("Cover","Team1","Team2","Targetable","Decor");
+        return Physics2D.Linecast(this.transform.position, Target.transform.position, ~MyLayerMask);
+    }
+
+    private void RemoveEnemyFromScript(GameObject Enemy)
+    {
+        EnemyInTrigger.Remove(Enemy);
+        if(EnemyDetectedDictionary.ContainsKey(Enemy)) EnemyDetectedDictionary.Remove(Enemy);
+    }
+
+    private int ThisLayer
+    {
+        get
+        {
+            return gameObject.layer;
+        }
+    }
+    private int EnemiesLayer
+    {
+        get
+        {
+            if (LayerMask.LayerToName(ThisLayer) == "Team1") return LayerMask.NameToLayer("Team2");
+            if (LayerMask.LayerToName(ThisLayer) == "Team2") return LayerMask.NameToLayer("Team1");
+            else return LayerMask.NameToLayer("Default");
+        }
+    }
+}

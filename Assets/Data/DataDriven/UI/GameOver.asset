@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df64d4f75aaf9184e940acc06b2dcc2d, type: 3}
+  m_Name: GameOver
+  m_EditorClassIdentifier: 
+  DefaultUI: {fileID: 4304465066973260920, guid: 554a6c8ec89920e439e8b6b7a0262a21,
+    type: 3}
+  TitleText: Game Over
+  DescriptionText: 
+  _ImageSprite: {fileID: 0}
+  Actions:
+  - {fileID: 11400000, guid: 67c6b220135559d4aa1db5154316e1e1, type: 2}
+  - {fileID: 11400000, guid: 67c6b220135559d4aa1db5154316e1e1, type: 2}
