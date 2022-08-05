@@ -14,7 +14,7 @@ public class Test : MonoBehaviour
 
     private void Start()
     {
-        
+        print(CameraManager.Manager);
     }
 
 private void Update()

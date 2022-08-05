@@ -8,7 +8,9 @@ using Cinemachine;
 public class CameraManager : MonoBehaviour
 {
     private static GameObject CameraManagerGameObject ;
-    public static CameraManager Singleton;
+    public static CameraManager Manager;
+
+    [Space(30)]
 
     [SerializeField] private Transform VirtualsCamerasTransform;
     [SerializeField] private CinemachineVirtualCamera PlayerCamera;
@@ -47,7 +49,7 @@ public class CameraManager : MonoBehaviour
         {
             CameraManagerGameObject = this.gameObject;
             DontDestroyOnLoad(CameraManagerGameObject);
-            Singleton = this;
+            Manager = this;
         }
     }
 

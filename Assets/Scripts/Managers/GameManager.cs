@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
         SearchAllEntitesInGame();
 
     }
+    #endregion
 
     private void SearchAllEntitesInGame() // A remplacer plus tard par un système manuel lorsque l'on chargera le niveau
     {
@@ -73,7 +74,7 @@ public class GameManager : MonoBehaviour
         Team2 = myTeam2List;
     }
 
-    #endregion
+
 
 
 

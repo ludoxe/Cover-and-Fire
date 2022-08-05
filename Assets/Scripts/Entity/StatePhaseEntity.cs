@@ -13,7 +13,9 @@ public enum EnumState
     InWaitingPosition,
     InAimPosition,
     InFire,
-    ExitCover
+    ExitCover,
+    MeleeExecute,
+    MeleeExecuted
 }
 
 public class StatePhaseEntity : MonoBehaviour
@@ -219,6 +221,17 @@ public class StatePhaseEntity : MonoBehaviour
 
     #endregion
 
+    #region AccessSingleton
+
+    CameraManager GetCameraManager {get => CameraManager.Manager ; }
+
+
+    #endregion
+
+    #region AccessDataAddon
+
+    #endregion
+
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -321,7 +334,7 @@ public class StatePhaseEntity : MonoBehaviour
     #region States
     private void Running()
     {
-        if (GetIsPlayer()) CameraManager.Singleton.CenterToPlayer();
+        if (GetIsPlayer()) GetCameraManager?.CenterToPlayer();
 
         SetIsCovered(false);
         StartCoroutine(PlayAnimation());
@@ -366,7 +379,7 @@ public class StatePhaseEntity : MonoBehaviour
     }
     private void InCover()
     {
-        if(GetIsPlayer()) CameraManager.Singleton.CenterBetweenAllActors();
+        if(GetIsPlayer()) GetCameraManager?.CenterBetweenAllActors();
 
         PlacePlayerToFaceWithCover();
         SetIsCovered(true);
@@ -473,7 +486,7 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void ExitCover()
     {
-        if (GetIsPlayer()) CameraManager.Singleton.CenterToPlayer();
+        if (GetIsPlayer()) GetCameraManager?.CenterToPlayer();
 
         PlacePlayerToFaceWithCover();
 
@@ -640,52 +653,7 @@ public class StatePhaseEntity : MonoBehaviour
 
 
     }
-
-    /*
-        private void VisualBulletEffect()
-        {
-            var WeaponCanon = ShootVariables.WeaponCanon.transform;
-            var BulletWeaponLineCache = ShootVariables.BulletWeaponLineCache;
-
-            var BulletLineGameObject = Instantiate(BulletWeaponLineCache, new Vector2(), new Quaternion());
-
-            BulletLineGameObject.SetActive(true); // Active le gameObject pour y acc�der dans la variable ci dessous + initialiser le GO
-            var BulletLine = BulletLineGameObject.GetComponent<LineRenderer>();
-
-
-
-            if (LinecastResult.Count > 0)
-            {
-                RaycastHit2D Target = LinecastResult[0];
-
-                //d�place le transform de BulletLineGameObject et donc du point de r�f�rence de LineRenderer pour avoir une destination globale
-                BulletLineGameObject.transform.position = new Vector2();
-
-                //Set les points de la line renderer du canon � cible
-                BulletLine.SetPosition(0, WeaponCanon.position);
-                BulletLine.SetPosition(1, Target.point);
-            }
-
-            if (LinecastResult.Count == 0)
-            {
-                //d�place le transform de BulletLineGameObject et donc du point de r�f�rence de LineRenderer pour avoir une destination locale
-                BulletLineGameObject.transform.position = WeaponCanon.position;
-
-                //Les Bullets Line prennent les coordonn�es locales du BulletLineGameObject + set les points de la line renderer pour tirer en ligne droite
-                BulletLine.SetPosition(0, new Vector2());
-                BulletLine.SetPosition(1, (WeaponCanon.right * 500));
-
-
-            }
-            StartCoroutine(DestroyBulletLine());
-
-            IEnumerator DestroyBulletLine()
-            {
-                yield return new WaitForSeconds(0.05f);
-                Destroy(BulletLineGameObject);
-            }
-        }
-    */
+    
     private void VisualBulletEffect()
     {
         Transform WeaponCanon = ShootVariables.WeaponCanon.transform;
@@ -706,8 +674,6 @@ public class StatePhaseEntity : MonoBehaviour
     {
         if (LinecastResult.Count == 0) return;
         RaycastHit2D Target = LinecastResult[0];
-
-        print("Send from " + gameObject.name);
 
         if (Target.transform.TryGetComponent(out IDamageable TargetStatus))
         {
