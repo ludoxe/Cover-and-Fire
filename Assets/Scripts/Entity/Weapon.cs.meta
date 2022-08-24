@@ -3,7 +3,23 @@ guid: b87c6905f65e2274580d9ba90cef7541
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - WeaponGameObject: {instanceID: 0}
+  - BulletWeaponLineCache: {instanceID: 0}
+  - WeaponCanon: {instanceID: 0}
+  - FirstHandGripGunGameObject: {instanceID: 0}
+  - SecondHandGripGunGameObject: {instanceID: 0}
+  - BoneLeftArmDown: {instanceID: 0}
+  - BoneLeftArmUp: {instanceID: 0}
+  - FirstHandGripMeleeGameObject: {instanceID: 0}
+  - SecondHandGripMeleeGameObject: {instanceID: 0}
+  - LeftArmTarget: {instanceID: 0}
+  - RightArmTarget: {instanceID: 0}
+  - AimReferencePoint: {instanceID: 0}
+  - DefaultMeleeWeaponData: {fileID: 11400000, guid: 4fe9e30f2c4f1b4489f4b1bc25d06b32,
+      type: 2}
+  - HeadBone: {instanceID: 0}
+  - Target: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

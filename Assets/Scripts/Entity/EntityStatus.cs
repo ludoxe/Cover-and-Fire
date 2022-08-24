@@ -2,18 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityStatus : MonoBehaviour, IDamageable
+public class EntityStatus : MonoBehaviour, IDamageable, ISuperInitializable
 {
+    [Header("Dependencies")]
+    [SerializeField] private GameManager _GameManager ;
+
+    [Header("Stats")]
     [SerializeField] private float MaxHealth = 50;
     [SerializeField] private float health = 50;
 
+    [Header("Ragdoll Reference")]
     [SerializeField] private GameObject RagdollWhenDieRightOrientation;
     [SerializeField] private GameObject RagdollWhenDieLeftOrientation;
 
     [SerializeField] private GameObject Mainbone;
 
+    public void SuperInit()
+    {
+        GameObject SuperManager = GameObject.Find("Super Manager");
+        GameManager myGameManager = SuperManager.GetComponentInChildren<GameManager>();
 
+        if(SuperManager.GetComponentInChildren<GameManager>() != null)
+        {
+            _GameManager = myGameManager ;
+            print("working");
+        }
+        
+    }
 
+    #region interface
     private float Health
     {
         get
@@ -27,21 +44,24 @@ public class EntityStatus : MonoBehaviour, IDamageable
         }
     }
 
-    #region interface
+
 
     public void ReceiveDamage(Utility.StructDamageInfo DamageInfo)
     {
-        SetHealth(DamageInfo.DamageBase * -1);
+        IncrementHealth(DamageInfo.DamageBase * -1);
 
     }
 
     public void SetHealth(float AmountHealth)
     {
+        Health = AmountHealth;
+    }
+    public void IncrementHealth(float AmountHealth)
+    {
         Health += AmountHealth;
     }
 
     #endregion
-
 
 
     private void UpdateEntityStatus()
@@ -69,15 +89,18 @@ public class EntityStatus : MonoBehaviour, IDamageable
 
         Ragdoll.GetComponent<CharacterAppearance>().SetImportAppearanceSettings(CharacterAppearance);
         Ragdoll.transform.Find("Corpse/bone main corpse").localRotation = RagdollRotation;
+
+        if(_GameManager != null) Ragdoll.GetComponent<DeadRagdoll>().SetGameManager(_GameManager);
     }
 
     private IEnumerator Die()
     {
         this.gameObject.SetActive(false);
         SpawnRagdoll();
+        
         yield return null;
         Destroy(this.gameObject);
-        
+        StopAllCoroutines();          
     }
 
 

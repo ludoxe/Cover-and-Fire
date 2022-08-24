@@ -12,11 +12,6 @@ public class Test : MonoBehaviour
     [Header("Change this")]
     public Data_UiWindow Menu;
 
-    private void Start()
-    {
-        print(CameraManager.Manager);
-    }
-
 private void Update()
 {
     if (Input.GetKeyUp(KeyInput))

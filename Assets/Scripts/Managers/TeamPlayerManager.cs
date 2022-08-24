@@ -2,23 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TeamPlayerManager : MonoBehaviour
+public class TeamPlayerManager : Manager
 {
 
-public enum Team
-{
- Team1,
- Team2
-}
+    [Header("Dependencies")]
+    [SerializeField] private GameManager GameManager;
 
-[Header("Singleton")]
-public static GameObject GameObjectManager;
-public static TeamPlayerManager Manager;
-
-[Header("Data")]
-[SerializeField] private Team TeamPlayer = Team.Team1 ;
+//Receive Propreties
+[SerializeField] private Team TeamPlayer {get => GameManager.GetTeamLayerPlayer(); } 
 private int _selectedSoldier = 0;
-
 private int SelectedSoldier 
 {
     set
@@ -36,10 +28,24 @@ private int SelectedSoldier
     }
 }
 
+#region init
+
+private void Start()
+{
+    SuperManager _SuperManager = GameObject.Find("Super Manager").GetComponent<SuperManager>();
+    GameManager = _SuperManager.GetManager<GameManager>() as GameManager;
+}
+
+#endregion
+
 #region Public Get
 public GameObject GetSelectedSoldier()
 {
-    return ReceiveTeamPlayer()[SelectedSoldier];
+    List<GameObject> TeamPlayer = ReceiveTeamPlayer();
+
+    if(TeamPlayer.Count > 0)    
+    return TeamPlayer[SelectedSoldier];
+    else return null ;
 }
 
 #endregion
@@ -48,47 +54,22 @@ public GameObject GetSelectedSoldier()
 
 public List<GameObject> ReceiveTeam1()
 {
-    return GameManager.Manager.GetTeam1Entities();
+    return GameManager.GetTeam1Entities();
 }
 public List<GameObject> ReceiveTeam2()
 {
-    return GameManager.Manager.GetTeam2Entities();
+    return GameManager.GetTeam2Entities();
 }
 public List<GameObject> ReceiveTeamPlayer()
 {
-    if(TeamPlayer == Team.Team1) return ReceiveTeam1();
-    else return ReceiveTeam2();
-
-         
+        return GameManager.GetTeamPlayerEntities();    
 }
 
 #endregion
 
 #region public Set
 
-public void SetTeamPlayer(Team newTeam)
-{
-    TeamPlayer = newTeam;
-}
-
 #endregion
-
-
-//Initialise le singleton
-private void Awake()
-{
-    if(GameObjectManager == null)
-    {
-        GameObjectManager = this.gameObject ;
-        Manager = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
-    else 
-    {
-        Destroy(this.gameObject);
-    }
-}
-
 
 
 }

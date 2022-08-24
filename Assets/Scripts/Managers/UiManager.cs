@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using System;
 using TMPro;
 
-public class UiManager : MonoBehaviour
+public class UiManager : Manager
 {
 
     [Header("Singleton")]

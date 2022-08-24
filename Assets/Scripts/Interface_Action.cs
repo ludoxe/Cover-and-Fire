@@ -76,6 +76,12 @@ public class Interface_Action : MonoBehaviour
             case EnumState.ExitCover:
             return;
 
+            case EnumState.MeleeExecute:
+            return;
+
+            case EnumState.KilledByExecution:
+            return;
+
             default:
                 Debug.LogError(State + " isn't valid");
                 return;

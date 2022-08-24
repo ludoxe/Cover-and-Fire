@@ -6,17 +6,22 @@ using UnityEngine.U2D.IK ;
 public class Weapon : MonoBehaviour
 {
     [Header("Weapon")]
-    private Data_Item_Gun WeaponData;
+    private Data_Item_Gun GunData;
+    private Data_Item_MeleeWeapon MeleeWeaponData;
     [SerializeField] private GameObject WeaponGameObject;
     [SerializeField] private GameObject BulletWeaponLineCache;
     [SerializeField] private GameObject WeaponCanon ;
 
-    [Header("Weapon Placement")]
-    [SerializeField] private GameObject FirstHandGripGameObject;
-    [SerializeField] private GameObject SecondHandGripGameObject;
+    [Header("Gun Placement")]
+    [SerializeField] private GameObject FirstHandGripGunGameObject;
+    [SerializeField] private GameObject SecondHandGripGunGameObject;
     [SerializeField]private GameObject BoneLeftArmDown;
     [SerializeField] private GameObject BoneLeftArmUp;
-    private GameObject BoneForAim { get { if (WeaponData == null) return null; else if (WeaponData.GetTwoHandsGun) return BoneLeftArmDown; else return BoneLeftArmUp; } }
+    private GameObject BoneForAim { get { if (GunData == null) return null; else if (GunData.GetTwoHandsGun) return BoneLeftArmDown; else return BoneLeftArmUp; } }
+
+    [Header("Melee Weapon Placement")]
+    [SerializeField] private GameObject FirstHandGripMeleeGameObject;
+    [SerializeField] private GameObject SecondHandGripMeleeGameObject;
 
     [Header("Arm Target")]
     [SerializeField] private GameObject LeftArmTarget;
@@ -26,19 +31,38 @@ public class Weapon : MonoBehaviour
     [SerializeField] private GameObject AimReferencePoint;
     private float AngleBetweenEntityAndWeaponCanon;
 
+    [Header("Default Melee Weapon")]
+
+    [SerializeField] private Data_Item_MeleeWeapon DefaultMeleeWeaponData;
+
+    [Header("Cache")]
+    private Data_Item_Gun PreviousGunWeaponData;
+    private Data_Item_MeleeWeapon PreviousMeleeWeaponData;
+
     [Header("Other")]
     [SerializeField] private GameObject HeadBone;
     [SerializeField] private GameObject Target;
 
-    public Data_Item_Gun SetWeapon
+
+    public Data_Item_Gun SetGunWeapon
     { 
         set
         {
-            WeaponData = value;
-            UpdateScript();
+            PreviousGunWeaponData = GunData;
+            GunData = value;
+            UpdateScriptForGun();
         }
     }
+    public Data_Item_MeleeWeapon SetMeleeWeapon
+    {
+        set
+        {
+            PreviousMeleeWeaponData = MeleeWeaponData;
+            MeleeWeaponData = value;
+            UpdateScriptForMeleeWeapon();
+        }
 
+    }
     private void Start()
     {
         ExternalSetStatePhaseEntityStructVariables();
@@ -49,8 +73,8 @@ public class Weapon : MonoBehaviour
 
         AimStruct.LeftArmTarget = LeftArmTarget;
         AimStruct.RightArmTarget = RightArmTarget;
-        AimStruct.FirstHandGripGameObject = FirstHandGripGameObject;
-        AimStruct.SecondHandGripGameObject = SecondHandGripGameObject;
+        AimStruct.FirstHandGripGameObject = FirstHandGripGunGameObject;
+        AimStruct.SecondHandGripGameObject = SecondHandGripGunGameObject;
         AimStruct.AimReferencePoint = AimReferencePoint;
 
 
@@ -63,25 +87,58 @@ public class Weapon : MonoBehaviour
         GetComponent<StatePhaseEntity>().ShootVariables = ShootStruct;
 
         //Si bug, deplacer dans une autre methode non existante
-        GetComponent<StatePhaseEntity>().DamageInfo = WeaponData.GetWeaponDamageStats;
+        GetComponent<StatePhaseEntity>().DamageInfo = GunData.GetWeaponDamageStats;
             
     }
     private void ExternalSetAnimator()
     {
-         GetComponent<Animator>().runtimeAnimatorController = WeaponData.GetAnimatorGun ;
+         GetComponent<Animator>().runtimeAnimatorController = GunData.GetAnimatorGun ;
+    }
+
+    private void ExternalSetMeleeAnimationClip()
+    {
+        StatePhaseEntity spEntity = GetComponent<StatePhaseEntity>();
+
+        spEntity.SetExecuteAnimation(MeleeWeaponData.GetExecuteAnimation());
+        spEntity.SetAnimationForExecuted(MeleeWeaponData.GetKilledByExecutionAnimation()) ;
+    }
+    private void ExternalSetExecutedPosition()
+    {
+        StatePhaseEntity spEntity = GetComponent<StatePhaseEntity>();
+        spEntity.SetExecutedLocalPosition(MeleeWeaponData.GetExecutedPosition());
     }
 
     private void UpdateScript() 
     {
-        if (WeaponData == null) return;
+        UpdateScriptForGun();
+        UpdateScriptForMeleeWeapon();
+    }
+    private void UpdateScriptForGun()
+    {
+        if (GunData != null)
+        {
+            if (GunData == PreviousGunWeaponData) return;
 
-        ExternalSetAnimator();
-        ExternalSetStatePhaseEntityStructVariables(); //Si bug, supprimer cette ligne
+            ExternalSetAnimator();
+            ExternalSetStatePhaseEntityStructVariables(); //Si bug, supprimer cette ligne
 
-        FirstHandGripGameObject.transform.localPosition = WeaponData.GetFirstHandGripPosition;
-        SecondHandGripGameObject.transform.localPosition = WeaponData.GetSecondHandGripPosition;
-        WeaponCanon.transform.localPosition = WeaponData.GetCanonPosition;
-        WeaponCanon.transform.localRotation = Quaternion.Euler(WeaponData.GetCanonPosition);
+            FirstHandGripGunGameObject.transform.localPosition = GunData.GetFirstHandGripPosition;
+            SecondHandGripGunGameObject.transform.localPosition = GunData.GetSecondHandGripPosition;
+            WeaponCanon.transform.localPosition = GunData.GetCanonPosition;
+            WeaponCanon.transform.localRotation = Quaternion.Euler(GunData.GetCanonPosition);
+        }
+    }
+    private void UpdateScriptForMeleeWeapon()
+    {
+        if(MeleeWeaponData == null) MeleeWeaponData = DefaultMeleeWeaponData ;
+
+        ExternalSetMeleeAnimationClip();
+        ExternalSetExecutedPosition();
+
+        if(MeleeWeaponData == PreviousMeleeWeaponData) return;
+
+        FirstHandGripMeleeGameObject.transform.localPosition = MeleeWeaponData.GetFirstHandGripPosition();
+        SecondHandGripMeleeGameObject.transform.localPosition = MeleeWeaponData.GetSecondHandGripPosition();
     }
 
 }

@@ -9,6 +9,7 @@ using TMPro;
 [CreateAssetMenu(menuName = "DataDriven/UI/Window", fileName = "Custom Window")]
 public class Data_UiWindow : ScriptableObject
 {
+    
     [Header("Reference")]
     [SerializeField] private GameObject DefaultUI ;
 
@@ -16,7 +17,7 @@ public class Data_UiWindow : ScriptableObject
     [SerializeField] string TitleText;
     [SerializeField] string DescriptionText;
     [SerializeField] Sprite _ImageSprite;
-    [NonReorderable][SerializeField] private Data_Action[] Actions;
+    [NonReorderable][SerializeField] private ActionButton[] ActionButtons;
 
     #region private Get
     private GameObject GetTitlePanel(Window scriptReferences) => scriptReferences.TitlePanel;
@@ -33,18 +34,16 @@ public class Data_UiWindow : ScriptableObject
     #endregion
     public void ShowMenu()
     {
-        ShowMenu(TitleText, DescriptionText, _ImageSprite, Actions);
+        ShowMenu(TitleText, DescriptionText, _ImageSprite, ActionButtons);
     }
     public void ShowMenu(
         string _Title = "",
         string _Description = "",
         Sprite _Image = null,
-        Data_Action[] _Options = null)
+        ActionButton[] _Options = null)
     {
         var UiInstance = Instantiate(DefaultUI);
         Window WindowScript = UiInstance.GetComponentInChildren<Window>();
-
-        //GetReference(UiInstance);
 
         if (_Title == "") GetTitlePanel(WindowScript)?.SetActive(false);
         else
@@ -66,11 +65,13 @@ public class Data_UiWindow : ScriptableObject
         {
             GetOptionPanelGroup(WindowScript)?.SetActive(true);
 
-            foreach (Data_Action Action in _Options)
+            foreach (ActionButton ActionButton in _Options)
             {
                 var newOption = Instantiate(GetOptionPanelCache(WindowScript), GetOptionPanelGroup(WindowScript).transform);
                 Button myButton = newOption.GetComponentInChildren<Button>();
-                myButton.onClick.AddListener(() => Action.Action());
+                myButton.onClick.AddListener(() => ActionButton.Action.Action());
+                myButton.GetComponentInChildren<TextMeshProUGUI>().text = ActionButton.ActionName ;
+            
                 //Some code here   
             }
 
@@ -78,5 +79,11 @@ public class Data_UiWindow : ScriptableObject
         }
 
     }
+    [Serializable]
+    public class ActionButton 
+    {
+        public Data_Action Action;
+        public string ActionName = "My Button";
 
+    }
 }

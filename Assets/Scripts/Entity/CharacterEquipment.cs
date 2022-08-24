@@ -7,6 +7,7 @@ public class CharacterEquipment : MonoBehaviour
 
     [Header("Item")]
     [SerializeField] private Data_Item_Gun Gun;
+    [SerializeField] private Data_Item_MeleeWeapon MeleeWeapon;
 
     [Space(10)]
 
@@ -47,8 +48,12 @@ public class CharacterEquipment : MonoBehaviour
 
     private void SetWeaponPlayer()
     {
-        if(GetComponent<Weapon>())
-        GetComponent<Weapon>().SetWeapon = Gun ;
+        if(TryGetComponent(out Weapon weapon))
+        {
+            weapon.SetGunWeapon = Gun;
+            weapon.SetMeleeWeapon = MeleeWeapon;
+        }
+       
     }
 
 }

@@ -59,14 +59,32 @@ public static class Utility
 
     }
 
+    public static SuperManager GetSuperManager()
+    {
+        return GameObject.Find("Super Manager")?.GetComponent<SuperManager>() ;
+    }
+
+
     #endregion
 }
 
-
-
+#region Interfaces
 public interface IDamageable
 {
     void ReceiveDamage(Utility.StructDamageInfo DamageInfo);
 
     void SetHealth(float HealthAmount);
 }
+
+public interface ISuperInitializable
+{
+    void SuperInit();
+}
+
+#endregion
+public enum Team
+{
+    Team1,
+    Team2
+}
+

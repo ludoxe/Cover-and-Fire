@@ -2,30 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectilesManager : MonoBehaviour
+public class ProjectilesManager : Manager
 {
-
-    public static GameObject ProjectilesManagerGameObject;
-    public static ProjectilesManager Manager ;
-
-    #region init Singleton
-    void Awake()
-    {
-        if (ProjectilesManagerGameObject != null) Destroy(this.gameObject);
-        else
-        {
-            ProjectilesManagerGameObject = this.gameObject;
-            DontDestroyOnLoad(ProjectilesManagerGameObject);
-            Manager = this;
-        }
-    }
-
-    void Start()
-    {
-        ProjectilesManagerGameObject.transform.position = new Vector2();
-    }
-
-    #endregion
 
     public void ShowVisualBulletEffect(Vector2 Position1, Vector2 Position2, GameObject BulletLineGameObject, float spawnTime = 0.075f)
     {

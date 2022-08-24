@@ -15,7 +15,7 @@ public enum EnumState
     InFire,
     ExitCover,
     MeleeExecute,
-    MeleeExecuted
+    KilledByExecution
 }
 
 public class StatePhaseEntity : MonoBehaviour
@@ -37,6 +37,10 @@ public class StatePhaseEntity : MonoBehaviour
      * Verifier
      */
 
+    [Header("Dependencies")]
+    [SerializeField] private CameraManager _CameraManager;
+    [SerializeField] private ProjectilesManager _ProjectilesManager;
+
     [Header("Id")]
     [SerializeField] private bool IsPlayer = false;
 
@@ -46,12 +50,18 @@ public class StatePhaseEntity : MonoBehaviour
     [SerializeField] [Range(-1, 1)] private int WalkingDirection = 1;
     [SerializeField] private float SpeedMovement = 2 ;
 
+    [Header("MeleeAttack")]
+    private AnimationClip ExecuteAnimation;
+    private AnimationClip AnimationForExecuted;
+    private AnimationClip KilledByExecutionAnimation;
+    private Vector2 ExecutedLocalPosition;
 
     [Header("Cover Info")]
     private bool IsCovered = false;
     private GameObject Cover;
     private bool IsInCoverTouchable;
 
+    [Header("Component Reference")]
     private Animator animator;
 
     [Header("structs")]
@@ -65,6 +75,7 @@ public class StatePhaseEntity : MonoBehaviour
     [SerializeField] private List<GameObject> EnemiesList = new List<GameObject>();
     [SerializeField] private int EnemySelector = -1;
     private GameObject Target;
+    private GameObject EnemyInMeleeRange ;
 
     [Header("Target Bound")]
     [SerializeField] private List<Transform> CacheTargetBoundsListUncovered;
@@ -72,6 +83,7 @@ public class StatePhaseEntity : MonoBehaviour
 
     [Header("Data Driven")]
     [SerializeField] private Data_UiWindow Menu ;
+
     
 
     private List<Transform> TargetBoundsListForAim //
@@ -117,6 +129,8 @@ public class StatePhaseEntity : MonoBehaviour
     }
 
     private List<RaycastHit2D> LinecastResult;
+
+    private bool IsEnemyInMeleeRange { get => EnemyInMeleeRange == null || EnemyInMeleeRange.activeSelf == false  ? false : true; }
 
     #region structs
 
@@ -207,6 +221,23 @@ public class StatePhaseEntity : MonoBehaviour
     {
         IsInCoverTouchable = IsTouchable;
     }
+    public void SetExecuteAnimation(AnimationClip _ExecuteAnimation)
+    {
+        ExecuteAnimation = _ExecuteAnimation;
+    }
+    public void SetAnimationForExecuted(AnimationClip ExecutedAnimation)
+    {
+        AnimationForExecuted = ExecutedAnimation;
+    }
+    public void SetKilledByExecutionAnimation(AnimationClip KilledAnimation)
+    {
+        KilledByExecutionAnimation = KilledAnimation;
+    }
+    public void SetExecutedLocalPosition(Vector2 position)
+    {
+        ExecutedLocalPosition = position;
+    }
+
 
     #endregion
 
@@ -219,18 +250,23 @@ public class StatePhaseEntity : MonoBehaviour
         SetEnemySelectedByGameObject(Target);
     }
 
-    #endregion
-
-    #region AccessSingleton
-
-    CameraManager GetCameraManager {get => CameraManager.Manager ; }
-
+    public void ReceiveEnemyInMeleeRange(GameObject Enemy)
+    {
+        EnemyInMeleeRange = Enemy;
+    }
 
     #endregion
 
-    #region AccessDataAddon
+    #region Statics Methods
+
+    private void TouchControlLocker(bool myBool)
+    {
+        if (GetIsPlayer()) TouchControl.SetLockControlActions(myBool);
+    }
 
     #endregion
+
+    #region Init
 
     private void Start()
     {
@@ -238,7 +274,32 @@ public class StatePhaseEntity : MonoBehaviour
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Cover"), gameObject.layer);
         SetState(GetState);
 
+        SuperManager _SuperManager = GameObject.Find("Super Manager").GetComponent<SuperManager>();
+        if (_CameraManager == null)
+        {
+            _CameraManager = _SuperManager.GetManager<CameraManager>() as CameraManager;
+        }
+        if (_ProjectilesManager == null)
+        {
+            _ProjectilesManager = _SuperManager.GetManager<ProjectilesManager>() as ProjectilesManager;
+        }
     }
+
+    CameraManager GetCameraManager {get => _CameraManager ; }
+
+    
+
+    private void CameraManagerCenterToPlayer()
+    {
+        if (GetIsPlayer()) GetCameraManager?.CenterToPlayer();
+    }
+    private void CameraManagerCenterToBetweenAllActors()
+    {
+        if(GetIsPlayer()) GetCameraManager?.CenterBetweenAllActors();
+    }
+
+
+    #endregion
 
     //Concerne la sélection des ennemis
 
@@ -298,6 +359,8 @@ public class StatePhaseEntity : MonoBehaviour
         animator.SetBool("InAimPosition", false);
         animator.SetBool("InFire", false);
         animator.SetBool("ExitCover", false);
+        animator.SetBool("MeleeExecute", false);
+        animator.SetBool("KilledByExecution", false);
 
         animator.SetBool(BoolName, true);
     }
@@ -310,13 +373,51 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void ChangeState()
     {
-        if (State == EnumState.Running) Running(); 
-        else if (State == EnumState.EnterInCover) EnterInCover();
-        else if (State == EnumState.InCover) InCover();
-        else if (State == EnumState.InWaitingPosition) InWaitingPosition();
-        else if (State == EnumState.InAimPosition) InAimPosition();
-        else if (State == EnumState.InFire) InFire();
-        else if (State == EnumState.ExitCover) ExitCover();
+        if (!gameObject.activeSelf) return;
+        //StopAllCoroutines();
+
+        switch(State)
+        {
+            case EnumState.Running:
+                Running();
+                 break;
+
+            case EnumState.EnterInCover:
+                EnterInCover();
+                break;
+
+            case EnumState.InCover:
+                InCover();
+                break;
+
+            case EnumState.InWaitingPosition:
+                InWaitingPosition();
+                break;
+
+            case EnumState.InAimPosition:
+                InAimPosition();
+                break;
+
+            case EnumState.InFire:
+                InFire();
+                break;
+
+            case EnumState.ExitCover:
+                ExitCover();
+                break;
+
+            case EnumState.MeleeExecute:
+                MeleeExecute();
+                break;
+
+            case EnumState.KilledByExecution:
+                KilledByExecution();
+                break;
+
+
+
+
+        }
     }
     private void SetPreviousState()
     {
@@ -334,7 +435,7 @@ public class StatePhaseEntity : MonoBehaviour
     #region States
     private void Running()
     {
-        if (GetIsPlayer()) GetCameraManager?.CenterToPlayer();
+        CameraManagerCenterToPlayer();
 
         SetIsCovered(false);
         StartCoroutine(PlayAnimation());
@@ -343,9 +444,16 @@ public class StatePhaseEntity : MonoBehaviour
             //Jouer une animation
             animator.CrossFade("Running", 0.01f);
             SelectAnimatorTrueBool("Running");
-            while(GetIsCovered() == false ) 
+            while(GetState == EnumState.Running ) 
             {
                 transform.Translate(new Vector3(1,0,0)*Time.deltaTime *SpeedMovement) ;
+
+                if(IsEnemyInMeleeRange) 
+                {
+                    SetState(EnumState.MeleeExecute);
+                    yield break ;
+                }
+
                 yield return null;
             }
             yield return null;
@@ -367,9 +475,9 @@ public class StatePhaseEntity : MonoBehaviour
             animator.CrossFade(MyAnimationClip.name, 0.01f);
 
             //S'assure que le joueur ne fait change pas d'Etat pendant l'op�ration
-            TouchControl.SetLockControlActions(true);
+            TouchControlLocker(true);
             yield return new WaitForSeconds(MyAnimationClip.length);
-            TouchControl.SetLockControlActions(false);
+            TouchControlLocker(false);
 
             //Placer l'entit� en position 
             transform.position = CoverCharacterPredifineTransform.PositionInCover;
@@ -379,7 +487,7 @@ public class StatePhaseEntity : MonoBehaviour
     }
     private void InCover()
     {
-        if(GetIsPlayer()) GetCameraManager?.CenterBetweenAllActors();
+        CameraManagerCenterToBetweenAllActors();
 
         PlacePlayerToFaceWithCover();
         SetIsCovered(true);
@@ -408,7 +516,7 @@ public class StatePhaseEntity : MonoBehaviour
         StartCoroutine(PlayAnimation());
         IEnumerator PlayAnimation()
         {
-            //Placer ceci pour fonctionner quand on se met � couvert
+            //Enlever l'influence des solvers pour faire jouer l'animation
             AimVariables.LeftArmTarget.GetComponentInParent<LimbSolver2D>().weight = 1;
 
             //Jouer une animation
@@ -422,9 +530,7 @@ public class StatePhaseEntity : MonoBehaviour
             }
 
             yield return null;
-
         }
-
     }
 
     private void InAimPosition()
@@ -486,7 +592,7 @@ public class StatePhaseEntity : MonoBehaviour
 
     private void ExitCover()
     {
-        if (GetIsPlayer()) GetCameraManager?.CenterToPlayer();
+        CameraManagerCenterToPlayer();
 
         PlacePlayerToFaceWithCover();
 
@@ -502,13 +608,71 @@ public class StatePhaseEntity : MonoBehaviour
             animator.CrossFade(MyAnimationClip.name, 0.01f);
 
             //S'assure que le joueur ne fait change pas d'Etat pendant l'op�ration
-            TouchControl.SetLockControlActions(true);
+            TouchControlLocker(true);
             yield return new WaitForSeconds(MyAnimationClip.length);
-            TouchControl.SetLockControlActions(false);
+            TouchControlLocker(false);
 
             SetState(EnumState.Running);
         }
     }
+
+    private void MeleeExecute()
+    {
+        StatePhaseEntity EnemyStatePhaseEntity = EnemyInMeleeRange.GetComponent<StatePhaseEntity>();
+
+        CameraManagerCenterToPlayer();
+        SetIsCovered(true);
+   
+        EnemyStatePhaseEntity.SetKilledByExecutionAnimation(AnimationForExecuted);
+        EnemyStatePhaseEntity.SetState(EnumState.KilledByExecution);
+        EnemyInMeleeRange.transform.position = this.transform.TransformPoint(ExecutedLocalPosition);
+
+
+        StartCoroutine(PlayAnimation());
+
+        IEnumerator PlayAnimation()
+        {
+            AnimationClip MyAnimationClip = ExecuteAnimation ;
+
+            //Jouer l'animation pour sortir de couverture
+            animator.CrossFade(MyAnimationClip.name, 0.01f);
+
+            //S'assure que le joueur ne fait change pas d'Etat pendant l'op�ration
+            TouchControlLocker(true);
+            yield return new WaitForSeconds(MyAnimationClip.length);
+            TouchControlLocker(false);
+            SetState(EnumState.Running);
+        }
+
+
+    }
+
+    private void KilledByExecution()
+    {
+        CameraManagerCenterToPlayer();
+        
+        SetIsCovered(true);
+
+        GetComponent<Rigidbody2D>().simulated = false;
+
+        StartCoroutine(PlayAnimation());
+
+        IEnumerator PlayAnimation()
+        {
+            AnimationClip MyAnimationClip = KilledByExecutionAnimation;
+
+            //Jouer l'animation pour sortir de couverture
+            animator.CrossFade(MyAnimationClip.name, 0.01f);
+
+            //S'assure que le joueur ne fait change pas d'Etat pendant l'op�ration
+            TouchControlLocker(true);
+            yield return new WaitForSeconds(MyAnimationClip.length);
+            TouchControlLocker(false);
+
+            GetComponent<EntityStatus>().SetHealth(0);
+        }        
+    }
+
 
     #endregion
 
@@ -533,8 +697,6 @@ public class StatePhaseEntity : MonoBehaviour
             LinecastResult = null;
         }
     }
-
-
     private Vector2 RandomTargetPositionBetweenBounds()
     {
         if (Target == null)
@@ -555,7 +717,6 @@ public class StatePhaseEntity : MonoBehaviour
         Vector2 RandomTargetPositionBetweenBounds = (Vector2)TargetBoundsListForAim[0].position + RandomAim * VectorDirectionBetweenTargetBounds; //On part de LowerBounds, et on rajoute entre 0 et 1 * la direction vers Upper
         return RandomTargetPositionBetweenBounds;
     }
-
     private void AimAngle() //D�fini l'angle du bras pour lors du tir ou de la vis�e
     {
         if (Target == null) return; //Ne fonctionne pas sans Target
@@ -588,7 +749,6 @@ public class StatePhaseEntity : MonoBehaviour
         //D�fini l'angle de l'animator pour correspondre � l'angle pour viser l'ennemi
         GetComponent<Animator>().SetFloat("angle direction", Angle);
     }
-
 
     // Lance une linecast de l'entit� jusqu'� la cible, retourne une Liste filtr�e
     private List<RaycastHit2D> SendLinecastToTargetAndConvertToFilteredList(bool FilterLinecastFromCover = true)
@@ -663,11 +823,11 @@ public class StatePhaseEntity : MonoBehaviour
         {
             RaycastHit2D Target = LinecastResult[0];
 
-            ProjectilesManager.Manager.ShowVisualBulletEffect(WeaponCanon.position, Target.point,BulletWeaponLineCache);
+            _ProjectilesManager.ShowVisualBulletEffect(WeaponCanon.position, Target.point,BulletWeaponLineCache);
         }
         if (LinecastResult.Count == 0)
         {
-            ProjectilesManager.Manager.ShowVisualBulletEffect(WeaponCanon.position, WeaponCanon.right * 500, BulletWeaponLineCache);
+            _ProjectilesManager.ShowVisualBulletEffect(WeaponCanon.position, WeaponCanon.right * 500, BulletWeaponLineCache);
         }
     }
     private void SendDamage()
@@ -681,5 +841,7 @@ public class StatePhaseEntity : MonoBehaviour
         }
 
     }
+
+
 
 }
