@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class GameManager : Manager
 {
+    
+    /* 
+    Le gameManager détermine si le joueur a gagné ou perdu en:
+    - Contrôlant l'Etat de la partie (joueurs et ennemis présents)
+    - Contrôlant l'Etat des missions 
+    - Gérant la situation de win ou de lose
+    */
+
 
     [Header("Parameters")]
     [SerializeField] private Team TeamLayerPlayer = Team.Team1;
@@ -15,6 +23,9 @@ public class GameManager : Manager
     [Header("Data")]
     [SerializeField] private Data_UiWindow GameOverMenu;
 
+    [Header("Dependencies")]
+    private MissionManager _MissionManager;
+
     #region Public Access
 
     public List<GameObject> GetAllEntities()
@@ -25,8 +36,11 @@ public class GameManager : Manager
     }
     public List<GameObject> GetTeamEntities(Team TeamLayer)
     {
-        if(TeamLayer == Team.Team1) return new List<GameObject>(Team1);
-        else if (TeamLayer == Team.Team2) return new List<GameObject>(Team2) ;
+
+        
+
+        if(TeamLayer == Team.Team1) return Team1;
+        else if (TeamLayer == Team.Team2) return Team2;
         else 
         {
             Debug.Log("error");
@@ -75,10 +89,16 @@ public class GameManager : Manager
     }
     #endregion
 
-    private void Start() //A supprimer quand on chargera les niveaux
+    private void Start() 
     {
-        SearchAllEntitesInGame();
+
+        _MissionManager = SuperManager.GetSuperManager().GetManager<MissionManager>() as MissionManager ;
+
+        SearchAllEntitesInGame(); //A supprimer quand on chargera les niveaux
     }
+
+
+
     private void SearchAllEntitesInGame() // A remplacer plus tard par un système manuel lorsque l'on chargera le niveau
     {
         List<GameObject> myTeam1List = new List<GameObject>();

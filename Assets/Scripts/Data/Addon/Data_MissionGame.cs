@@ -17,11 +17,11 @@ public class Data_MissionGame : ScriptableObject
     public void SetIsMissionCompleted(bool IsCompleted) => IsMissionCompleted = IsCompleted;
     public void SetIsMissionFailed(bool IsFailed) => IsMissionFailed = IsFailed;
 
-    private void SetIsMissionCompleted()
+    public void SetIsMissionCompleted()
     {
         foreach(Data_MissionObjective Objective in ArrayWinObjectives)
-        {
-            if(Objective.IsObjectiveCompleted == false) 
+        { 
+            if(Objective.CheckMissionCondition() == false) 
             {
                 return;
             }
@@ -29,17 +29,15 @@ public class Data_MissionGame : ScriptableObject
         SetIsMissionCompleted(true);
 
     }
-    private void SetIsMissionFailed()
+    public void SetIsMissionFailed()
     {
         foreach (Data_MissionObjective Objective in ArrayLoseObjectives)
         {
-            if (Objective.IsObjectiveCompleted == true)
+            if (Objective.CheckMissionCondition() == true)
             {
                 SetIsMissionFailed(true);
             }
         }
-        
-
     }
 
 

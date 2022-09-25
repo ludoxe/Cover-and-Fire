@@ -12,6 +12,15 @@ public class SuperManager : Manager
     private List<Manager> AllManagers;
     private List<ISuperInitializable> AllInitializableGameObject;
 
+    #region Static access
+
+    public static SuperManager GetSuperManager()
+    {
+        return GameObject.Find("Super Manager").GetComponent<SuperManager>();
+    }
+
+    #endregion
+
     #region Public access
 
     //Créer une fonction pour récupérer le Manager que l'on veut
