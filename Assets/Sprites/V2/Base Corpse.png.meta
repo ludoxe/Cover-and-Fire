@@ -27,7 +27,7 @@ TextureImporter:
       213: -3181520134422007255
     second: right foot
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -44,10 +44,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -86,6 +88,8 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -97,6 +101,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -109,6 +114,20 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -130,10 +149,14 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone head
+        guid: 
         position: {x: 636.37274, y: 31.845215, z: 10}
         rotation: {x: 0, y: 0, z: 0.70889026, w: 0.70531887}
         length: 1278.6064
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: 7ddd11c6180ee1ca0800000000000000
       internalID: -6044146803416113705
       vertices:
@@ -455,15 +478,23 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone up left arm
+        guid: 
         position: {x: 273.62006, y: 1077.4458, z: 0}
         rotation: {x: 0, y: 0, z: -0.7765342, w: 0.6300751}
         length: 501.52942
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone down left arm
+        guid: 
         position: {x: 501.52933, y: 0.000019054269, z: 0}
         rotation: {x: 0, y: 0, z: 0.030410105, w: 0.9995375}
         length: 574.4297
         parentId: 0
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: 3ce5d0c90585eda00800000000000000
       internalID: 783160488447794883
       vertices:
@@ -1100,20 +1131,32 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone main corpse
+        guid: 
         position: {x: 304.39142, y: 33.698975, z: 0}
         rotation: {x: 0, y: 0, z: 0.71330875, w: 0.70084995}
         length: 710.6359
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone chest
+        guid: 
         position: {x: 710.6359, y: -0.000014622943, z: 0}
         rotation: {x: 0, y: 0, z: -0.00034526698, w: 0.99999994}
         length: 380.8443
         parentId: 0
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone neck
+        guid: 
         position: {x: 380.8442, y: 0.010369826, z: 0}
         rotation: {x: 0, y: 0, z: -0.0050655506, w: 0.9999872}
         length: 264.115
         parentId: 1
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: 09c47ff99606531e0800000000000000
       internalID: -2218761234638484336
       vertices:
@@ -1528,15 +1571,23 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone up right arm
+        guid: 
         position: {x: 32.92285, y: 1077.4458, z: 0}
         rotation: {x: 0, y: 0, z: -0.6296149, w: 0.7769074}
         length: 561.06305
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone down right arm
+        guid: 
         position: {x: 561.0629, y: -0.000027815111, z: 0}
         rotation: {x: 0, y: 0, z: -0.023793362, w: 0.99971694}
         length: 523.3769
         parentId: 0
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: adb0dbd5f30f53680800000000000000
       internalID: -8775844143915267110
       vertices:
@@ -2171,15 +2222,23 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone up left leg
+        guid: 
         position: {x: 199.38129, y: 1139.1661, z: 0}
         rotation: {x: 0, y: 0, z: -0.729097, w: 0.6844104}
         length: 520.5693
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone down left leg
+        guid: 
         position: {x: 520.56915, y: 0.00001107203, z: 0}
         rotation: {x: 0, y: 0, z: 0.008629917, w: 0.99996275}
         length: 572.744
         parentId: 0
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: c581802f0614a5f20800000000000000
       internalID: 3412111552319854684
       vertices:
@@ -2915,15 +2974,23 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone up right leg
+        guid: 
         position: {x: 61.774902, y: 1122.9064, z: 0}
         rotation: {x: 0, y: 0, z: -0.6694361, w: 0.7428697}
         length: 433.5656
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       - name: bone down right leg
+        guid: 
         position: {x: 433.56546, y: 0.000038682556, z: 0}
         rotation: {x: 0, y: 0, z: -0.0042985277, w: 0.99999076}
         length: 636.2211
         parentId: 0
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: bd14add4ee228d050800000000000000
       internalID: 5825444524907446747
       vertices:
@@ -3576,10 +3643,14 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone left leg
+        guid: 
         position: {x: 142.46545, y: 94.47827, z: 0}
         rotation: {x: 0, y: 0, z: -0.075115025, w: 0.9971749}
         length: 219.49551
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: 2482a148c3d0f0890800000000000000
       internalID: -7489753101728339902
       vertices:
@@ -3915,10 +3986,14 @@ TextureImporter:
       tessellationDetail: 0
       bones:
       - name: bone right leg
+        guid: 
         position: {x: 165.01355, y: 108.78356, z: 0}
         rotation: {x: 0, y: 0, z: -0.016659804, w: 0.99986124}
         length: 197.39937
         parentId: -1
+        color:
+          serializedVersion: 2
+          rgba: 0
       spriteID: 922f50e4b48f8d3d0800000000000000
       internalID: -3181520134422007255
       vertices:
@@ -4248,9 +4323,17 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-  spritePackingTag: 
+    nameFileIdTable:
+      body: -2218761234638484336
+      head: -6044146803416113705
+      left arm: 783160488447794883
+      left foot: -7489753101728339902
+      left leg: 3412111552319854684
+      right arm: -8775844143915267110
+      right foot: -3181520134422007255
+      right leg: 5825444524907446747
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
